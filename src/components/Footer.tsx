@@ -1,4 +1,4 @@
-import { GraduationCap, Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface FooterProps {
@@ -48,8 +48,15 @@ const Footer = ({ language }: FooterProps) => {
           {/* Logo & Description */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-                <GraduationCap className="h-6 w-6 text-accent-foreground" />
+              <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center overflow-hidden">
+                <img
+                  src="/lovable-uploads/f0aef100-4cfc-4c89-9f09-3a3df31884f5.png"
+                  alt="Logotipo academicoapp Angola"
+                  className="w-8 h-8 object-contain"
+                  loading="lazy"
+                  width={32}
+                  height={32}
+                />
               </div>
               <div>
                 <h3 className="font-bold text-xl">academicoapp</h3>
