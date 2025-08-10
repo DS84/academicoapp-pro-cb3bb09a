@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Menu, X, GraduationCap } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   language: string;
@@ -38,26 +39,26 @@ const Header = ({ language, setLanguage }: HeaderProps) => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-hero rounded-lg flex items-center justify-center">
-              <GraduationCap className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="font-bold text-xl text-primary">AcademicSupport</h1>
-              <p className="text-xs text-muted-foreground">Angola</p>
-            </div>
+            <Link to="/" className="flex items-center space-x-2">
+              <img src="/lovable-uploads/2f098c4d-57fc-4b8c-81f6-378d1e543f9c.png" alt="academicoapp logo" className="h-10 w-auto" loading="eager" />
+              <div>
+                <h1 className="font-bold text-xl text-primary">academicoapp</h1>
+                <p className="text-xs text-muted-foreground">Angola</p>
+              </div>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#students" className="text-foreground hover:text-accent transition-colors">
+            <Link to="/students" className="text-foreground hover:text-accent transition-colors">
               {t.students}
-            </a>
-            <a href="#teachers" className="text-foreground hover:text-accent transition-colors">
+            </Link>
+            <Link to="/teachers" className="text-foreground hover:text-accent transition-colors">
               {t.teachers}
-            </a>
-            <a href="#professionals" className="text-foreground hover:text-accent transition-colors">
+            </Link>
+            <Link to="/professionals" className="text-foreground hover:text-accent transition-colors">
               {t.professionals}
-            </a>
+            </Link>
             <a href="#about" className="text-foreground hover:text-accent transition-colors">
               {t.about}
             </a>
@@ -77,8 +78,8 @@ const Header = ({ language, setLanguage }: HeaderProps) => {
                 <SelectItem value="en">EN</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
-              {t.getStarted}
+            <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <Link to="/login">{t.getStarted}</Link>
             </Button>
           </div>
 
@@ -97,15 +98,15 @@ const Header = ({ language, setLanguage }: HeaderProps) => {
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-border">
             <nav className="flex flex-col space-y-4 mt-4">
-              <a href="#students" className="text-foreground hover:text-accent transition-colors">
+              <Link to="/students" className="text-foreground hover:text-accent transition-colors">
                 {t.students}
-              </a>
-              <a href="#teachers" className="text-foreground hover:text-accent transition-colors">
+              </Link>
+              <Link to="/teachers" className="text-foreground hover:text-accent transition-colors">
                 {t.teachers}
-              </a>
-              <a href="#professionals" className="text-foreground hover:text-accent transition-colors">
+              </Link>
+              <Link to="/professionals" className="text-foreground hover:text-accent transition-colors">
                 {t.professionals}
-              </a>
+              </Link>
               <a href="#about" className="text-foreground hover:text-accent transition-colors">
                 {t.about}
               </a>
@@ -122,8 +123,8 @@ const Header = ({ language, setLanguage }: HeaderProps) => {
                     <SelectItem value="en">EN</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
-                  {t.getStarted}
+                <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+                  <Link to="/login">{t.getStarted}</Link>
                 </Button>
               </div>
             </nav>

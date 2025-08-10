@@ -1,4 +1,5 @@
 import { GraduationCap, Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface FooterProps {
   language: string;
@@ -19,7 +20,7 @@ const Footer = ({ language }: FooterProps) => {
       careers: 'Carreiras',
       privacy: 'Privacidade',
       terms: 'Termos',
-      rights: '© 2024 AcademicSupport Angola. Todos os direitos reservados.'
+      rights: '© 2025 academicoapp Angola. Todos os direitos reservados.'
     },
     en: {
       tagline: 'Connecting futures, building Angola',
@@ -34,7 +35,7 @@ const Footer = ({ language }: FooterProps) => {
       careers: 'Careers',
       privacy: 'Privacy',
       terms: 'Terms',
-      rights: '© 2024 AcademicSupport Angola. All rights reserved.'
+      rights: '© 2025 academicoapp Angola. All rights reserved.'
     }
   };
 
@@ -51,7 +52,7 @@ const Footer = ({ language }: FooterProps) => {
                 <GraduationCap className="h-6 w-6 text-accent-foreground" />
               </div>
               <div>
-                <h3 className="font-bold text-xl">AcademicSupport</h3>
+                <h3 className="font-bold text-xl">academicoapp</h3>
                 <p className="text-sm text-primary-foreground/70">Angola</p>
               </div>
             </div>
@@ -69,9 +70,9 @@ const Footer = ({ language }: FooterProps) => {
           <div>
             <h4 className="font-semibold text-lg mb-4">{t.services}</h4>
             <ul className="space-y-3">
-              <li><a href="#students" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.students}</a></li>
-              <li><a href="#teachers" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.teachers}</a></li>
-              <li><a href="#professionals" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.professionals}</a></li>
+              <li><Link to="/students" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.students}</Link></li>
+              <li><Link to="/teachers" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.teachers}</Link></li>
+              <li><Link to="/professionals" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.professionals}</Link></li>
             </ul>
           </div>
 

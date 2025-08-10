@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { GraduationCap, Users, Briefcase, BookOpen, Target, Trophy } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface ServicesSectionProps {
   language: string;
@@ -119,8 +120,8 @@ const ServicesSection = ({ language }: ServicesSectionProps) => {
                     ))}
                   </ul>
                   
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                    {serviceInfo.cta}
+                  <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                    <Link to={`/${service.key}`}>{serviceInfo.cta}</Link>
                   </Button>
                 </CardContent>
               </Card>

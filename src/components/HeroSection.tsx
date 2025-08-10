@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, BookOpen, Briefcase } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import heroImage from '@/assets/hero-angola.jpg';
 
 interface HeroSectionProps {
@@ -63,19 +64,22 @@ const HeroSection = ({ language }: HeroSectionProps) => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-12">
-            <Button 
+            <Button asChild 
               size="lg" 
               className="bg-accent text-accent-foreground hover:bg-accent/90 text-lg px-8 py-6 shadow-elegant"
             >
-              {t.cta}
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <Link to="/login">
+                {t.cta}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
             <Button 
               variant="outline" 
               size="lg"
               className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary text-lg px-8 py-6"
+              asChild
             >
-              {t.secondary}
+              <a href="#services">{t.secondary}</a>
             </Button>
           </div>
 
