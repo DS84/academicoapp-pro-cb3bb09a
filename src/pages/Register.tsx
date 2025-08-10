@@ -1,38 +1,105 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Register = () => {
   const [language, setLanguage] = useState('pt');
+  const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState<'student' | 'teacher'>('student');
+  const navigate = useNavigate();
 
   const t = {
     pt: {
       title: 'Cadastro — academicoapp',
       h1: 'Criar conta',
-      name: 'Nome',
+      name: 'Nome completo',
       email: 'Email',
       password: 'Palavra-passe',
+      phone: 'Telefone',
+      accountType: 'Tipo de conta',
+      student: 'Estudante',
+      teacher: 'Professor/Orientador',
       submit: 'Cadastrar',
       alt: 'Já tens conta? Entrar',
+      or: 'ou',
     },
     en: {
       title: 'Register — academicoapp',
       h1: 'Create account',
-      name: 'Name',
+      name: 'Full name',
       email: 'Email',
       password: 'Password',
+      phone: 'Phone',
+      accountType: 'Account type',
+      student: 'Student',
+      teacher: 'Teacher/Mentor',
       submit: 'Register',
       alt: 'Already have an account? Sign in',
+      or: 'or',
     },
   }[language as 'pt' | 'en'];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const r = (session.user.user_metadata as any)?.role as string | undefined;
+        if (r === 'student') navigate('/students');
+        else if (r === 'teacher') navigate('/teachers');
+        else navigate('/');
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const r = (session.user.user_metadata as any)?.role as string | undefined;
+        if (r === 'student') navigate('/students');
+        else if (r === 'teacher') navigate('/teachers');
+        else navigate('/');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    const name = (form.elements.namedItem('name') as HTMLInputElement).value;
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+    const phone = (form.elements.namedItem('phone') as HTMLInputElement).value;
+
+    if (password.length < 6) {
+      toast.error('A palavra-passe deve ter no mínimo 6 caracteres.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const redirectUrl = `${window.location.origin}/`;
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: { role, full_name: name, phone }
+        }
+      });
+      if (error) throw error;
+      toast.success('Cadastro realizado! Verifica o teu email para confirmar.');
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Não foi possível concluir o cadastro.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,17 +116,36 @@ const Register = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">{t.name}</Label>
-              <Input id="name" required placeholder="O teu nome" />
+              <Input id="name" name="name" required placeholder="O teu nome" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">{t.email}</Label>
-              <Input id="email" type="email" required placeholder="nome@exemplo.com" />
+              <Input id="email" name="email" type="email" required placeholder="nome@exemplo.com" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">{t.password}</Label>
-              <Input id="password" type="password" required placeholder="••••••••" />
+              <Input id="password" name="password" type="password" required placeholder="••••••••" />
             </div>
-            <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">{t.submit}</Button>
+            <div className="space-y-2">
+              <Label htmlFor="phone">{t.phone}</Label>
+              <Input id="phone" name="phone" type="tel" required placeholder="+244 ..." />
+            </div>
+            <div className="space-y-2">
+              <Label>{t.accountType}</Label>
+              <RadioGroup value={role} onValueChange={(v) => setRole(v as 'student' | 'teacher')} className="grid grid-cols-2 gap-3">
+                <div className="flex items-center space-x-2 border border-border rounded-md p-3">
+                  <RadioGroupItem id="student" value="student" />
+                  <Label htmlFor="student" className="cursor-pointer">{t.student}</Label>
+                </div>
+                <div className="flex items-center space-x-2 border border-border rounded-md p-3">
+                  <RadioGroupItem id="teacher" value="teacher" />
+                  <Label htmlFor="teacher" className="cursor-pointer">{t.teacher}</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <Button type="submit" disabled={loading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+              {loading ? '...' : t.submit}
+            </Button>
           </form>
           <p className="text-sm text-muted-foreground mt-4">
             <Link to="/login" className="text-primary hover:underline">{t.alt}</Link>

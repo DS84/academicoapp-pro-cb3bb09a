@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Login = () => {
   const [language, setLanguage] = useState('pt');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const t = {
     pt: {
@@ -18,6 +22,9 @@ const Login = () => {
       password: 'Palavra-passe',
       submit: 'Entrar',
       alt: 'Não tens conta? Cadastrar',
+      or: 'ou',
+      google: 'Entrar com Google',
+      microsoft: 'Entrar com Microsoft',
     },
     en: {
       title: 'Login — academicoapp',
@@ -26,11 +33,66 @@ const Login = () => {
       password: 'Password',
       submit: 'Sign in',
       alt: "Don't have an account? Register",
+      or: 'or',
+      google: 'Sign in with Google',
+      microsoft: 'Sign in with Microsoft',
     },
   }[language as 'pt' | 'en'];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const role = (session.user.user_metadata as any)?.role as string | undefined;
+        if (role === 'student') navigate('/students');
+        else if (role === 'teacher') navigate('/teachers');
+        else navigate('/');
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const role = (session.user.user_metadata as any)?.role as string | undefined;
+        if (role === 'student') navigate('/students');
+        else if (role === 'teacher') navigate('/teachers');
+        else navigate('/');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      toast.success('Login bem-sucedido!');
+      // onAuthStateChange will redirect
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Email ou palavra-passe incorretos.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const oauthSignIn = async (provider: 'google' | 'azure') => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/` }
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Não foi possível iniciar sessão.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,14 +109,28 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">{t.email}</Label>
-              <Input id="email" type="email" required placeholder="nome@exemplo.com" />
+              <Input id="email" name="email" type="email" required placeholder="nome@exemplo.com" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">{t.password}</Label>
-              <Input id="password" type="password" required placeholder="••••••••" />
+              <Input id="password" name="password" type="password" required placeholder="••••••••" />
             </div>
-            <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">{t.submit}</Button>
+            <Button type="submit" disabled={loading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+              {loading ? '...' : t.submit}
+            </Button>
           </form>
+
+          <div className="flex items-center my-4">
+            <div className="flex-1 h-px bg-border" />
+            <span className="px-3 text-xs text-muted-foreground uppercase">{t.or}</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+
+          <div className="grid gap-3">
+            <Button variant="outline" disabled={loading} onClick={() => oauthSignIn('google')}> {t.google} </Button>
+            <Button variant="outline" disabled={loading} onClick={() => oauthSignIn('azure')}> {t.microsoft} </Button>
+          </div>
+
           <p className="text-sm text-muted-foreground mt-4">
             <Link to="/register" className="text-primary hover:underline">{t.alt}</Link>
           </p>
