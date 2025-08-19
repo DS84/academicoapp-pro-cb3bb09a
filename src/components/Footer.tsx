@@ -1,5 +1,6 @@
 import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import TermsModal from './TermsModal';
 
 interface FooterProps {
   language: string;
@@ -9,7 +10,6 @@ const Footer = ({ language }: FooterProps) => {
   const translations = {
     pt: {
       tagline: 'Conectando futuros, construindo Angola',
-      contact: 'Contacto',
       address: 'Luanda, Angola',
       services: 'Serviços',
       students: 'Estudantes',
@@ -22,16 +22,20 @@ const Footer = ({ language }: FooterProps) => {
       opportunities: 'Oportunidades',
       internships: 'Estágios',
       benefits: 'Benefícios',
+      contact: {
+        email: 'contacto@academicoapp.com',
+        phone: '942065632',
+        address: 'Luanda, Angola'
+      },
       legal: 'Legal',
       privacy: 'Privacidade',
       terms: 'Termos de Uso',
-      cookies: 'Política de Cookies',
+      cookies: 'Políticas de Cookies',
       rights: '© 2025 academicoapp Angola. Todos os direitos reservados.'
     },
     en: {
       tagline: 'Connecting futures, building Angola',
-      contact: 'Contact',
-      address: 'Luanda, Angola', 
+      address: 'Luanda, Angola',
       services: 'Services',
       students: 'Students',
       teachers: 'Teachers', 
@@ -40,13 +44,18 @@ const Footer = ({ language }: FooterProps) => {
       about: 'About Us',
       careers: 'Careers',
       career: 'Career',
-      opportunities: 'Opportunities',
-      internships: 'Internships',
-      benefits: 'Benefits',
+      opportunities: 'Oportunidades',
+      internships: 'Estágios',
+      benefits: 'Benefícios',
+      contact: {
+        email: 'contacto@academicoapp.com',
+        phone: '942065632',
+        address: 'Luanda, Angola'
+      },
       legal: 'Legal',
-      privacy: 'Privacy Policy',
-      terms: 'Terms of Service',
-      cookies: 'Cookie Policy',
+      privacy: 'Privacy',
+      terms: 'Terms of Use',
+      cookies: 'Cookie Policies',
       rights: '© 2025 academicoapp Angola. All rights reserved.'
     }
   };
@@ -108,20 +117,46 @@ const Footer = ({ language }: FooterProps) => {
           <div>
             <h4 className="font-semibold text-lg mb-4">{t.career}</h4>
             <ul className="space-y-3">
-              <li><a href="#careers" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.opportunities}</a></li>
+              <li><a href="#jobs" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.opportunities}</a></li>
               <li><a href="#internships" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.internships}</a></li>
-              <li><a href="#benefits" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.benefits}</a></li>
+              <li><a href="#mentorship" className="text-primary-foreground/80 hover:text-accent transition-colors">Mentoria</a></li>
             </ul>
           </div>
 
           {/* Legal */}
           <div>
             <h4 className="font-semibold text-lg mb-4">{t.legal}</h4>
-            <ul className="space-y-3">
-              <li><a href="#privacy" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.privacy}</a></li>
-              <li><a href="#terms" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.terms}</a></li>
-              <li><a href="#cookies" className="text-primary-foreground/80 hover:text-accent transition-colors">{t.cookies}</a></li>
-            </ul>
+            <div className="space-y-3 text-sm">
+              <TermsModal 
+                type="privacy" 
+                language={language}
+                trigger={
+                  <button className="text-primary-foreground/80 hover:text-accent transition-colors text-left">
+                    {t.privacy}
+                  </button>
+                }
+              />
+              <br />
+              <TermsModal 
+                type="terms" 
+                language={language}
+                trigger={
+                  <button className="text-primary-foreground/80 hover:text-accent transition-colors text-left">
+                    {t.terms}
+                  </button>
+                }
+              />
+              <br />
+              <TermsModal 
+                type="cookies" 
+                language={language}
+                trigger={
+                  <button className="text-primary-foreground/80 hover:text-accent transition-colors text-left">
+                    {t.cookies}
+                  </button>
+                }
+              />
+            </div>
           </div>
         </div>
 
@@ -131,11 +166,11 @@ const Footer = ({ language }: FooterProps) => {
             <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 mb-4 md:mb-0">
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4" />
-                <span className="text-sm">info@academicsupport.ao</span>
+                <span className="text-sm">{t.contact.email}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4" />
-                <span className="text-sm">+244 XXX XXX XXX</span>
+                <span className="text-sm">{t.contact.phone}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4" />

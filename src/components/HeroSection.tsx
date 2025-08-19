@@ -74,9 +74,8 @@ const HeroSection = ({ language }: HeroSectionProps) => {
               </Link>
             </Button>
             <Button 
-              variant="outline" 
               size="lg"
-              className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary text-lg px-8 py-6"
+              className="bg-red-600 text-primary-foreground hover:bg-red-700 text-lg px-8 py-6"
               asChild
             >
               <a href="#about">{t.secondary}</a>

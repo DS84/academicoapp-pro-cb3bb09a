@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 const Register = () => {
   const [language, setLanguage] = useState('pt');
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState<'student' | 'teacher'>('student');
+  const [role, setRole] = useState<'student' | 'teacher' | 'professional'>('student');
   const navigate = useNavigate();
 
   const t = {
@@ -27,6 +27,9 @@ const Register = () => {
       accountType: 'Tipo de conta',
       student: 'Estudante',
       teacher: 'Professor/Orientador',
+      professional: 'Profissional',
+      professionalArea: 'Área Profissional',
+      institution: 'Instituição',
       submit: 'Cadastrar',
       alt: 'Já tens conta? Entrar',
       or: 'ou',
@@ -41,6 +44,9 @@ const Register = () => {
       accountType: 'Account type',
       student: 'Student',
       teacher: 'Teacher/Mentor',
+      professional: 'Professional',
+      professionalArea: 'Professional Area',
+      institution: 'Institution',
       submit: 'Register',
       alt: 'Already have an account? Sign in',
       or: 'or',
@@ -76,6 +82,8 @@ const Register = () => {
     const email = (form.elements.namedItem('email') as HTMLInputElement).value;
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
     const phone = (form.elements.namedItem('phone') as HTMLInputElement).value;
+    const professionalArea = (form.elements.namedItem('professionalArea') as HTMLInputElement)?.value || '';
+    const institution = (form.elements.namedItem('institution') as HTMLInputElement)?.value || '';
 
     if (password.length < 6) {
       toast.error('A palavra-passe deve ter no mínimo 6 caracteres.');
@@ -90,7 +98,7 @@ const Register = () => {
         password,
         options: {
           emailRedirectTo: redirectUrl,
-          data: { role, full_name: name, phone }
+          data: { role, full_name: name, phone, professional_area: professionalArea, institution }
         }
       });
       if (error) throw error;
@@ -132,7 +140,7 @@ const Register = () => {
             </div>
             <div className="space-y-2">
               <Label>{t.accountType}</Label>
-              <RadioGroup value={role} onValueChange={(v) => setRole(v as 'student' | 'teacher')} className="grid grid-cols-2 gap-3">
+              <RadioGroup value={role} onValueChange={(v) => setRole(v as 'student' | 'teacher' | 'professional')} className="grid grid-cols-3 gap-3">
                 <div className="flex items-center space-x-2 border border-border rounded-md p-3">
                   <RadioGroupItem id="student" value="student" />
                   <Label htmlFor="student" className="cursor-pointer">{t.student}</Label>
@@ -141,7 +149,19 @@ const Register = () => {
                   <RadioGroupItem id="teacher" value="teacher" />
                   <Label htmlFor="teacher" className="cursor-pointer">{t.teacher}</Label>
                 </div>
+                <div className="flex items-center space-x-2 border border-border rounded-md p-3">
+                  <RadioGroupItem id="professional" value="professional" />
+                  <Label htmlFor="professional" className="cursor-pointer">{t.professional}</Label>
+                </div>
               </RadioGroup>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="professionalArea">{t.professionalArea}</Label>
+              <Input id="professionalArea" name="professionalArea" placeholder="Ex: Tecnologia, Medicina, Engenharia..." />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="institution">{t.institution}</Label>
+              <Input id="institution" name="institution" placeholder="Ex: Universidade Agostinho Neto, ISPTEC..." />
             </div>
             <Button type="submit" disabled={loading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
               {loading ? '...' : t.submit}
