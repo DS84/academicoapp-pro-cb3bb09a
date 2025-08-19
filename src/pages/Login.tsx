@@ -8,11 +8,15 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useSecurity } from '@/components/security/SecurityProvider';
+import { useAuditLog } from '@/hooks/useAuditLog';
 
 const Login = () => {
   const [language, setLanguage] = useState('pt');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { isRateLimited, logSecurityEvent } = useSecurity();
+  const { logAuthFailure, logAuthSuccess } = useAuditLog();
 
   const t = {
     pt: {
@@ -67,14 +71,27 @@ const Login = () => {
     const email = (form.elements.namedItem('email') as HTMLInputElement).value;
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
 
+    // Check rate limiting
+    if (isRateLimited(`login:${email}`)) {
+      toast.error('Muitas tentativas de login. Tente novamente em alguns minutos.');
+      logSecurityEvent('RATE_LIMIT_LOGIN_ATTEMPT', { email });
+      return;
+    }
+
     try {
       setLoading(true);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      if (error) {
+        await logAuthFailure(email, error.message);
+        throw error;
+      }
+      
+      await logAuthSuccess(email);
       toast.success('Login bem-sucedido!');
       // onAuthStateChange will redirect
     } catch (err: any) {
       toast.error(err?.message ?? 'Email ou palavra-passe incorretos.');
+      logSecurityEvent('LOGIN_FAILURE', { email, error: err?.message });
     } finally {
       setLoading(false);
     }
