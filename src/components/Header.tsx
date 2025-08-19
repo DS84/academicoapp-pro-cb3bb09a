@@ -3,13 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import UserDropdown from './UserDropdown';
+import SearchBar from './SearchBar';
 
 interface HeaderProps {
   language: string;
   setLanguage: (lang: string) => void;
+  isAuthenticated?: boolean;
+  user?: {
+    name?: string;
+    email?: string;
+    avatar?: string;
+  };
+  onLogout?: () => void;
 }
 
-const Header = ({ language, setLanguage }: HeaderProps) => {
+const Header = ({ language, setLanguage, isAuthenticated = false, user, onLogout }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const translations = {
@@ -63,7 +72,14 @@ const Header = ({ language, setLanguage }: HeaderProps) => {
             </a>
           </nav>
 
-          {/* Language Selector & CTA */}
+          {/* Search Bar (when authenticated) */}
+          {isAuthenticated && (
+            <div className="hidden md:block">
+              <SearchBar language={language} />
+            </div>
+          )}
+
+          {/* Language Selector & User Actions */}
           <div className="hidden md:flex items-center space-x-4">
             <Select value={language} onValueChange={setLanguage}>
               <SelectTrigger className="w-20">
@@ -74,9 +90,19 @@ const Header = ({ language, setLanguage }: HeaderProps) => {
                 <SelectItem value="en">EN</SelectItem>
               </SelectContent>
             </Select>
-            <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Link to="/login">{t.getStarted}</Link>
-            </Button>
+            
+            {isAuthenticated ? (
+              <UserDropdown 
+                language={language}
+                isAuthenticated={isAuthenticated}
+                user={user}
+                onLogout={onLogout || (() => {})}
+              />
+            ) : (
+              <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+                <Link to="/login">{t.getStarted}</Link>
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -109,6 +135,14 @@ const Header = ({ language, setLanguage }: HeaderProps) => {
               <a href="#contact" className="text-foreground hover:text-accent transition-colors">
                 {t.contact}
               </a>
+              
+              {/* Mobile Search Bar (when authenticated) */}
+              {isAuthenticated && (
+                <div className="pt-4">
+                  <SearchBar language={language} />
+                </div>
+              )}
+              
               <div className="flex items-center space-x-4 pt-4">
                 <Select value={language} onValueChange={setLanguage}>
                   <SelectTrigger className="w-20">
@@ -119,9 +153,19 @@ const Header = ({ language, setLanguage }: HeaderProps) => {
                     <SelectItem value="en">EN</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-                  <Link to="/login">{t.getStarted}</Link>
-                </Button>
+                
+                {isAuthenticated ? (
+                  <UserDropdown 
+                    language={language}
+                    isAuthenticated={isAuthenticated}
+                    user={user}
+                    onLogout={onLogout || (() => {})}
+                  />
+                ) : (
+                  <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+                    <Link to="/login">{t.getStarted}</Link>
+                  </Button>
+                )}
               </div>
             </nav>
           </div>

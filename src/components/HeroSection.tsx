@@ -79,7 +79,7 @@ const HeroSection = ({ language }: HeroSectionProps) => {
               className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary text-lg px-8 py-6"
               asChild
             >
-              <a href="#services">{t.secondary}</a>
+              <a href="#about">{t.secondary}</a>
             </Button>
           </div>
 
