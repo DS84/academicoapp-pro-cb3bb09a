@@ -1,4 +1,5 @@
 import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { FaWhatsapp, FaXTwitter } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import TermsModal from './TermsModal';
 
@@ -91,6 +92,12 @@ const Footer = ({ language }: FooterProps) => {
               <Facebook className="h-6 w-6 text-primary-foreground/60 hover:text-accent cursor-pointer transition-colors" />
               <Instagram className="h-6 w-6 text-primary-foreground/60 hover:text-accent cursor-pointer transition-colors" />
               <Linkedin className="h-6 w-6 text-primary-foreground/60 hover:text-accent cursor-pointer transition-colors" />
+              <a href="https://wa.me/244942065632" target="_blank" rel="noopener noreferrer">
+                <FaWhatsapp className="h-6 w-6 text-primary-foreground/60 hover:text-green-500 cursor-pointer transition-colors" />
+              </a>
+              <a href="https://x.com/academicoapp" target="_blank" rel="noopener noreferrer">
+                <FaXTwitter className="h-6 w-6 text-primary-foreground/60 hover:text-slate-400 cursor-pointer transition-colors" />
+              </a>
             </div>
           </div>
 

@@ -2,8 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, Send, MessageCircle } from 'lucide-react';
-import { FaWhatsapp, FaXTwitter } from 'react-icons/fa6';
+import { Mail, Phone, MapPin, Send } from 'lucide-react';
 
 interface ContactSectionProps {
   language: string;
@@ -27,11 +26,6 @@ const ContactSection = ({ language }: ContactSectionProps) => {
         phone: '942065632',
         address: 'Luanda, Angola'
       },
-      social: {
-        title: 'Redes Sociais',
-        whatsapp: 'WhatsApp',
-        twitter: 'X (Twitter)'
-      },
       hours: {
         title: 'Horário de Atendimento',
         weekdays: 'Segunda a Sexta: 8h00 - 18h00',
@@ -53,11 +47,6 @@ const ContactSection = ({ language }: ContactSectionProps) => {
         email: 'contacto@academicoapp.com',
         phone: '942065632',
         address: 'Luanda, Angola'
-      },
-      social: {
-        title: 'Social Media',
-        whatsapp: 'WhatsApp',
-        twitter: 'X (Twitter)'
       },
       hours: {
         title: 'Office Hours',
@@ -146,36 +135,6 @@ const ContactSection = ({ language }: ContactSectionProps) => {
                     </div>
                     <span className="text-foreground">{t.info.address}</span>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-card">
-              <CardContent className="p-6">
-                <h3 className="text-2xl font-bold text-primary mb-6">{t.social.title}</h3>
-                <div className="space-y-4">
-                  <a 
-                    href="https://wa.me/244942065632" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-3 hover:bg-accent/5 p-2 rounded-lg transition-colors"
-                  >
-                    <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
-                      <FaWhatsapp className="h-5 w-5 text-green-500" />
-                    </div>
-                    <span className="text-foreground">{t.social.whatsapp}</span>
-                  </a>
-                  <a 
-                    href="https://x.com/academicoapp" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-3 hover:bg-accent/5 p-2 rounded-lg transition-colors"
-                  >
-                    <div className="w-10 h-10 bg-slate-500/10 rounded-lg flex items-center justify-center">
-                      <FaXTwitter className="h-5 w-5 text-slate-500" />
-                    </div>
-                    <span className="text-foreground">{t.social.twitter}</span>
-                  </a>
                 </div>
               </CardContent>
             </Card>
