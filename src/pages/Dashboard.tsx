@@ -2,14 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
-import HeroSection from '@/components/HeroSection';
-import ServicesSection from '@/components/ServicesSection';
-import AboutSection from '@/components/AboutSection';
-import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 
-const Index = () => {
+const Dashboard = () => {
   const [language, setLanguage] = useState('pt');
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -33,6 +29,21 @@ const Index = () => {
     };
   };
 
+  const translations = {
+    pt: {
+      title: 'Dashboard',
+      welcome: 'Bem-vindo ao seu dashboard',
+      description: 'Aqui podes gerir as tuas atividades e configurações.'
+    },
+    en: {
+      title: 'Dashboard',
+      welcome: 'Welcome to your dashboard',
+      description: 'Here you can manage your activities and settings.'
+    }
+  };
+
+  const t = translations[language as keyof typeof translations];
+
   return (
     <div className="min-h-screen bg-background">
       <Header 
@@ -42,13 +53,16 @@ const Index = () => {
         user={getUserData()}
         onLogout={handleLogout}
       />
-      <HeroSection language={language} />
-      <ServicesSection language={language} />
-      <AboutSection language={language} />
-      <ContactSection language={language} />
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold text-primary mb-4">{t.title}</h1>
+          <p className="text-xl text-muted-foreground mb-8">{t.welcome}</p>
+          <p className="text-muted-foreground">{t.description}</p>
+        </div>
+      </main>
       <Footer language={language} />
     </div>
   );
 };
 
-export default Index;
+export default Dashboard;
