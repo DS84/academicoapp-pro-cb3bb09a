@@ -78,6 +78,72 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          record_id: string | null
+          table_name: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      auth_rate_limits: {
+        Row: {
+          attempts: number
+          blocked_until: string | null
+          email: string | null
+          id: string
+          ip_address: unknown
+          last_attempt: string
+        }
+        Insert: {
+          attempts?: number
+          blocked_until?: string | null
+          email?: string | null
+          id?: string
+          ip_address: unknown
+          last_attempt?: string
+        }
+        Update: {
+          attempts?: number
+          blocked_until?: string | null
+          email?: string | null
+          id?: string
+          ip_address?: unknown
+          last_attempt?: string
+        }
+        Relationships: []
+      }
       career_consultants: {
         Row: {
           availability: string | null
