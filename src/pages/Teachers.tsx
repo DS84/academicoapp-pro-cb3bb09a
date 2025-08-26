@@ -11,6 +11,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, format } from 'date-fns';
+import TeacherTriaging from '@/components/teachers/TeacherTriaging';
+import TeacherServicesCatalog from '@/components/teachers/TeacherServicesCatalog';
+import TeacherDashboard from '@/components/teachers/TeacherDashboard';
+import TeacherCheckoutFlow from '@/components/teachers/TeacherCheckoutFlow';
 
 const Teachers = () => {
   const [language, setLanguage] = useState('pt');
@@ -62,6 +66,11 @@ const Teachers = () => {
   const [profile, setProfile] = useState<any>(null);
   const [mentor, setMentor] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showTriaging, setShowTriaging] = useState(false);
+  const [showCatalog, setShowCatalog] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [selectedService, setSelectedService] = useState<any>(null);
+  const [recommendedTracks, setRecommendedTracks] = useState<string[]>([]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, sess) => {
@@ -163,6 +172,24 @@ const Teachers = () => {
     fetchSessionsRange(start, end);
   };
 
+  const handleTriagingComplete = (tracks: string[]) => {
+    setRecommendedTracks(tracks);
+    setShowTriaging(false);
+    setShowCatalog(true);
+  };
+
+  const handleServiceSelect = (service: any) => {
+    setSelectedService(service);
+    setShowCatalog(false);
+    setShowCheckout(true);
+  };
+
+  const handleCheckoutComplete = () => {
+    setShowCheckout(false);
+    setSelectedService(null);
+    // Refresh dashboard or show success message
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -174,6 +201,39 @@ const Teachers = () => {
       <main className="container mx-auto px-4 py-16">
         <h1 className="text-4xl md:text-5xl font-bold text-primary mb-6">{t.h1}</h1>
         <p className="text-lg text-muted-foreground max-w-3xl mb-10">{t.desc}</p>
+
+        {showTriaging && (
+          <div className="mb-10">
+            <TeacherTriaging
+              language={language}
+              onRecommendation={handleTriagingComplete}
+            />
+          </div>
+        )}
+
+        {showCatalog && (
+          <div className="mb-10">
+            <TeacherServicesCatalog
+              language={language}
+              onServiceSelect={handleServiceSelect}
+              recommendedTracks={recommendedTracks}
+            />
+          </div>
+        )}
+
+        {showCheckout && selectedService && (
+          <div className="mb-10">
+            <TeacherCheckoutFlow
+              language={language}
+              service={selectedService}
+              onComplete={handleCheckoutComplete}
+              onBack={() => {
+                setShowCheckout(false);
+                setShowCatalog(true);
+              }}
+            />
+          </div>
+        )}
 
         {!session?.user ? (
           <Card>
@@ -189,147 +249,169 @@ const Teachers = () => {
           </Card>
         ) : loading ? (
           <p className="text-muted-foreground">Carregando…</p>
-        ) : !mentor ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t.dashboard}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">{t.noMentor}</p>
-            </CardContent>
-          </Card>
         ) : (
-          <section aria-label={t.dashboard}>
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>{t.dashboard}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                {format(weekRange.start, 'dd/MM/yyyy')} – {format(weekRange.end, 'dd/MM/yyyy')}
-              </CardContent>
-            </Card>
+          <div className="space-y-8">
+            {!showTriaging && !showCatalog && !showCheckout && (
+              <div className="text-center space-y-4">
+                <Button
+                  size="lg"
+                  onClick={() => setShowTriaging(true)}
+                  className="mr-4"
+                >
+                  Começar Triagem (60s)
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setShowCatalog(true)}
+                >
+                  Ver Catálogo de Serviços
+                </Button>
+              </div>
+            )}
 
-            <Tabs defaultValue="week" value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-              <TabsList className="grid grid-cols-3 mb-6">
-                <TabsTrigger value="week">{t.tabs.week}</TabsTrigger>
-                <TabsTrigger value="month">{t.tabs.month}</TabsTrigger>
-                <TabsTrigger value="period">{t.tabs.period}</TabsTrigger>
-              </TabsList>
+            {session?.user && profile && !showTriaging && !showCatalog && !showCheckout && (
+              <TeacherDashboard
+                language={language}
+                profile={profile}
+              />
+            )}
 
-              <TabsContent value="week">
-                <Card>
+            {/* Legacy mentor schedule view */}
+            {mentor && !showTriaging && !showCatalog && !showCheckout && (
+              <section aria-label={t.dashboard}>
+                <Card className="mb-6">
                   <CardHeader>
-                    <CardTitle>{t.tabs.week}</CardTitle>
+                    <CardTitle>{t.dashboard}</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    {loadingSessions ? (
-                      <p className="text-muted-foreground">Carregando…</p>
-                    ) : sessions.length === 0 ? (
-                      <p className="text-muted-foreground">{t.classesEmpty}</p>
-                    ) : (
-                      <div className="grid gap-4">
-                        {sessions.map((s) => (
-                          <div key={s.id} className="border rounded-md p-4">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                              <div>
-                                <p className="font-medium">{new Date(s.session_date).toLocaleString()}</p>
-                                <p className="text-sm text-muted-foreground">Duração: {s.duration_minutes} min • Tipo: {s.session_type} • Estado: {s.status}</p>
-                              </div>
-                              <div>
-                                <span className="text-sm text-muted-foreground">Aluno ID: {s.student_id}</span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                  <CardContent className="text-sm text-muted-foreground">
+                    {format(weekRange.start, 'dd/MM/yyyy')} – {format(weekRange.end, 'dd/MM/yyyy')}
                   </CardContent>
                 </Card>
-              </TabsContent>
 
-              <TabsContent value="month">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{t.tabs.month}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {loadingSessions ? (
-                      <p className="text-muted-foreground">Carregando…</p>
-                    ) : sessions.length === 0 ? (
-                      <p className="text-muted-foreground">{t.classesEmpty}</p>
-                    ) : (
-                      <div className="grid gap-4">
-                        {sessions.map((s) => (
-                          <div key={s.id} className="border rounded-md p-4">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                              <div>
-                                <p className="font-medium">{new Date(s.session_date).toLocaleString()}</p>
-                                <p className="text-sm text-muted-foreground">Duração: {s.duration_minutes} min • Tipo: {s.session_type} • Estado: {s.status}</p>
+                <Tabs defaultValue="week" value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+                  <TabsList className="grid grid-cols-3 mb-6">
+                    <TabsTrigger value="week">{t.tabs.week}</TabsTrigger>
+                    <TabsTrigger value="month">{t.tabs.month}</TabsTrigger>
+                    <TabsTrigger value="period">{t.tabs.period}</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="week">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>{t.tabs.week}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {loadingSessions ? (
+                          <p className="text-muted-foreground">Carregando…</p>
+                        ) : sessions.length === 0 ? (
+                          <p className="text-muted-foreground">{t.classesEmpty}</p>
+                        ) : (
+                          <div className="grid gap-4">
+                            {sessions.map((s) => (
+                              <div key={s.id} className="border rounded-md p-4">
+                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                                  <div>
+                                    <p className="font-medium">{new Date(s.session_date).toLocaleString()}</p>
+                                    <p className="text-sm text-muted-foreground">Duração: {s.duration_minutes} min • Tipo: {s.session_type} • Estado: {s.status}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm text-muted-foreground">Aluno ID: {s.student_id}</span>
+                                  </div>
+                                </div>
                               </div>
-                              <div>
-                                <span className="text-sm text-muted-foreground">Aluno ID: {s.student_id}</span>
-                              </div>
-                            </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
 
-              <TabsContent value="period">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{t.tabs.period}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <form onSubmit={handleSearchPeriod} className="grid gap-4 max-w-xl mb-6">
-                      <div className="grid gap-2">
-                        <Label htmlFor="start">{t.periodStart}</Label>
-                        <Input id="start" type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="end">{t.periodEnd}</Label>
-                        <Input id="end" type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} />
-                      </div>
-                      <div>
-                        <Button type="submit">{t.search}</Button>
-                      </div>
-                    </form>
-
-                    {periodStart && periodEnd && (
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {t.rangeLabel(format(new Date(`${periodStart}T00:00:00`), 'dd/MM/yyyy'), format(new Date(`${periodEnd}T00:00:00`), 'dd/MM/yyyy'))}
-                      </p>
-                    )}
-
-                    {loadingSessions ? (
-                      <p className="text-muted-foreground">Carregando…</p>
-                    ) : sessions.length === 0 ? (
-                      <p className="text-muted-foreground">{t.classesEmpty}</p>
-                    ) : (
-                      <div className="grid gap-4">
-                        {sessions.map((s) => (
-                          <div key={s.id} className="border rounded-md p-4">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                              <div>
-                                <p className="font-medium">{new Date(s.session_date).toLocaleString()}</p>
-                                <p className="text-sm text-muted-foreground">Duração: {s.duration_minutes} min • Tipo: {s.session_type} • Estado: {s.status}</p>
+                  <TabsContent value="month">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>{t.tabs.month}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {loadingSessions ? (
+                          <p className="text-muted-foreground">Carregando…</p>
+                        ) : sessions.length === 0 ? (
+                          <p className="text-muted-foreground">{t.classesEmpty}</p>
+                        ) : (
+                          <div className="grid gap-4">
+                            {sessions.map((s) => (
+                              <div key={s.id} className="border rounded-md p-4">
+                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                                  <div>
+                                    <p className="font-medium">{new Date(s.session_date).toLocaleString()}</p>
+                                    <p className="text-sm text-muted-foreground">Duração: {s.duration_minutes} min • Tipo: {s.session_type} • Estado: {s.status}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm text-muted-foreground">Aluno ID: {s.student_id}</span>
+                                  </div>
+                                </div>
                               </div>
-                              <div>
-                                <span className="text-sm text-muted-foreground">Aluno ID: {s.student_id}</span>
-                              </div>
-                            </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </section>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="period">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>{t.tabs.period}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <form onSubmit={handleSearchPeriod} className="grid gap-4 max-w-xl mb-6">
+                          <div className="grid gap-2">
+                            <Label htmlFor="start">{t.periodStart}</Label>
+                            <Input id="start" type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="end">{t.periodEnd}</Label>
+                            <Input id="end" type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} />
+                          </div>
+                          <div>
+                            <Button type="submit">{t.search}</Button>
+                          </div>
+                        </form>
+
+                        {periodStart && periodEnd && (
+                          <p className="text-sm text-muted-foreground mb-4">
+                            {t.rangeLabel(format(new Date(`${periodStart}T00:00:00`), 'dd/MM/yyyy'), format(new Date(`${periodEnd}T00:00:00`), 'dd/MM/yyyy'))}
+                          </p>
+                        )}
+
+                        {loadingSessions ? (
+                          <p className="text-muted-foreground">Carregando…</p>
+                        ) : sessions.length === 0 ? (
+                          <p className="text-muted-foreground">{t.classesEmpty}</p>
+                        ) : (
+                          <div className="grid gap-4">
+                            {sessions.map((s) => (
+                              <div key={s.id} className="border rounded-md p-4">
+                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                                  <div>
+                                    <p className="font-medium">{new Date(s.session_date).toLocaleString()}</p>
+                                    <p className="text-sm text-muted-foreground">Duração: {s.duration_minutes} min • Tipo: {s.session_type} • Estado: {s.status}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm text-muted-foreground">Aluno ID: {s.student_id}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+              </section>
+            )}
+          </div>
         )}
       </main>
       <Footer language={language} />
