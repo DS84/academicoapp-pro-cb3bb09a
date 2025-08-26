@@ -48,11 +48,14 @@ const TeacherServicesCatalog = ({ language, onServiceSelect, recommendedTracks =
 
   const fetchServices = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('teacher-services');
+      const { data, error } = await supabase
+        .from('teacher_services')
+        .select('*')
+        .order('created_at', { ascending: true });
       
       if (error) throw error;
       
-      setServices(data.services || []);
+      setServices(data || []);
     } catch (error) {
       console.error('Error fetching teacher services:', error);
       toast({
