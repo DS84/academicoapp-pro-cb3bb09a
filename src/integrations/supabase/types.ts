@@ -144,6 +144,57 @@ export type Database = {
         }
         Relationships: []
       }
+      bookings: {
+        Row: {
+          agenda: string
+          created_at: string
+          dados_formulario: Json | null
+          estudante_id: string
+          id: string
+          service_id: string
+          status: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          agenda: string
+          created_at?: string
+          dados_formulario?: Json | null
+          estudante_id: string
+          id?: string
+          service_id: string
+          status?: string
+          updated_at?: string
+          valor: number
+        }
+        Update: {
+          agenda?: string
+          created_at?: string
+          dados_formulario?: Json | null
+          estudante_id?: string
+          id?: string
+          service_id?: string
+          status?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_estudante_id_fkey"
+            columns: ["estudante_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       career_consultants: {
         Row: {
           availability: string | null
@@ -882,6 +933,134 @@ export type Database = {
           },
         ]
       }
+      scholarship_opportunities: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          grau: string
+          id: string
+          is_active: boolean | null
+          link: string | null
+          nome: string
+          pais: string
+          prazo: string | null
+          requisitos: Json | null
+          updated_at: string
+          valor_bolsa: number | null
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          grau: string
+          id?: string
+          is_active?: boolean | null
+          link?: string | null
+          nome: string
+          pais: string
+          prazo?: string | null
+          requisitos?: Json | null
+          updated_at?: string
+          valor_bolsa?: number | null
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          grau?: string
+          id?: string
+          is_active?: boolean | null
+          link?: string | null
+          nome?: string
+          pais?: string
+          prazo?: string | null
+          requisitos?: Json | null
+          updated_at?: string
+          valor_bolsa?: number | null
+        }
+        Relationships: []
+      }
+      service_mentors: {
+        Row: {
+          areas: string[] | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          nome: string
+          profile_id: string
+          rating: number | null
+          slots: Json | null
+          updated_at: string
+        }
+        Insert: {
+          areas?: string[] | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          nome: string
+          profile_id: string
+          rating?: number | null
+          slots?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          areas?: string[] | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          nome?: string
+          profile_id?: string
+          rating?: number | null
+          slots?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_mentors_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          formatos: string[] | null
+          id: string
+          nome: string
+          preco_base: number
+          sla_horas: number
+          slug: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          formatos?: string[] | null
+          id?: string
+          nome: string
+          preco_base: number
+          sla_horas: number
+          slug: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          formatos?: string[] | null
+          id?: string
+          nome?: string
+          preco_base?: number
+          sla_horas?: number
+          slug?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       skill_categories: {
         Row: {
           created_at: string
@@ -937,6 +1116,47 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "skill_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_goals: {
+        Row: {
+          created_at: string
+          estudante_id: string
+          id: string
+          meta: string
+          prazo: string | null
+          progresso_percent: number | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          estudante_id: string
+          id?: string
+          meta: string
+          prazo?: string | null
+          progresso_percent?: number | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          estudante_id?: string
+          id?: string
+          meta?: string
+          prazo?: string | null
+          progresso_percent?: number | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_goals_estudante_id_fkey"
+            columns: ["estudante_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1036,6 +1256,56 @@ export type Database = {
             columns: ["subject_id"]
             isOneToOne: false
             referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_materials: {
+        Row: {
+          content: Json | null
+          created_at: string
+          creator_id: string | null
+          disciplina: string
+          id: string
+          is_public: boolean | null
+          tags: string[] | null
+          tipo: string
+          titulo: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string
+          creator_id?: string | null
+          disciplina: string
+          id?: string
+          is_public?: boolean | null
+          tags?: string[] | null
+          tipo: string
+          titulo: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string
+          creator_id?: string | null
+          disciplina?: string
+          id?: string
+          is_public?: boolean | null
+          tags?: string[] | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_materials_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

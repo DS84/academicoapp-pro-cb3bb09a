@@ -1,7 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users, Video, FileText, Calendar, Star } from 'lucide-react';
+import { useServices } from './APIIntegration';
 
 interface Service {
   id: string;
@@ -22,6 +24,19 @@ interface ServicesCatalogProps {
 }
 
 const ServicesCatalog = ({ language, onServiceSelect }: ServicesCatalogProps) => {
+  const { services, loading, fetchServices } = useServices();
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
   const t = {
     pt: {
       title: 'Catálogo de Serviços',
@@ -193,7 +208,8 @@ const ServicesCatalog = ({ language, onServiceSelect }: ServicesCatalogProps) =>
     }
   }[language as 'pt' | 'en'];
 
-  const services: Service[] = [
+  // Static fallback services
+  const staticServices: Service[] = [
     {
       id: 'tutoring',
       title: t.services.tutoring.title,
@@ -256,6 +272,20 @@ const ServicesCatalog = ({ language, onServiceSelect }: ServicesCatalogProps) =>
     }
   ];
 
+  // Use real services data from API or fallback to static data
+  const servicesToDisplay = services.length > 0 ? services.map(service => ({
+    id: service.slug,
+    title: service.nome,
+    description: service.descricao,
+    basePrice: `${service.preco_base.toLocaleString('pt-PT')} AOA`,
+    sla: `${service.sla_horas}h`,
+    format: service.formatos[0] as 'live' | 'async' | 'hybrid',
+    category: service.tags[0] as 'tutoring' | 'materials' | 'career' | 'scholarships' | 'mentoring',
+    icon: <Video className="h-6 w-6" />,
+    features: ['Feature 1', 'Feature 2'],
+    ctaText: 'Selecionar'
+  })) : staticServices;
+
   const getFormatColor = (format: string) => {
     switch (format) {
       case 'live': return 'bg-green-100 text-green-800';
@@ -273,7 +303,7 @@ const ServicesCatalog = ({ language, onServiceSelect }: ServicesCatalogProps) =>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {services.map((service) => (
+        {servicesToDisplay.map((service) => (
           <Card key={service.id} className="h-full flex flex-col hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex items-start justify-between mb-4">
