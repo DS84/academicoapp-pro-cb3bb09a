@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, CreditCard, Smartphone, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TeacherCheckoutFlowProps {
   language: string;
@@ -102,8 +103,21 @@ const TeacherCheckoutFlow = ({ language, service, onComplete, onBack }: TeacherC
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Simular processamento do pagamento
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const { data, error } = await supabase.functions.invoke('teacher-services', {
+        body: {
+          service_slug: service.slug,
+          agenda: formData.agenda,
+          dados_formulario: {
+            objectives: formData.objectives,
+            experience: formData.experience,
+            institution: formData.institution,
+            paymentMethod: formData.paymentMethod,
+            phoneNumber: formData.phoneNumber
+          }
+        }
+      });
+
+      if (error) throw error;
       
       toast({
         title: t.success,
@@ -112,6 +126,7 @@ const TeacherCheckoutFlow = ({ language, service, onComplete, onBack }: TeacherC
       
       handleNext();
     } catch (error) {
+      console.error('Error submitting teacher order:', error);
       toast({
         title: 'Erro',
         description: 'Erro ao processar o pedido',

@@ -3,7 +3,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users, Video, FileText, Calendar, Star } from 'lucide-react';
-import { useServices } from './APIIntegration';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface Service {
   id: string;
@@ -24,11 +25,30 @@ interface ServicesCatalogProps {
 }
 
 const ServicesCatalog = ({ language, onServiceSelect }: ServicesCatalogProps) => {
-  const { services, loading, fetchServices } = useServices();
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchServices();
   }, []);
+
+  const fetchServices = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('services');
+      if (error) throw error;
+      setServices(data.services || []);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível carregar os serviços.',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (

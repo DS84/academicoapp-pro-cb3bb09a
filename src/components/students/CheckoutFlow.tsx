@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { CheckCircle, Clock, CreditCard, Smartphone, FileText } from 'lucide-react';
-import { useBooking, useCheckout, usePDF } from './APIIntegration';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface CheckoutFlowProps {
@@ -29,9 +29,9 @@ const CheckoutFlow = ({ language, bookingData, onComplete }: CheckoutFlowProps) 
   const [checkoutStep, setCheckoutStep] = useState(1);
   const [paymentReference, setPaymentReference] = useState<string>('');
   
-  const { createBooking, loading: bookingLoading } = useBooking();
-  const { processPayment, loading: paymentLoading } = useCheckout();
-  const { generatePDF, loading: pdfLoading } = usePDF();
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const { toast } = useToast();
 
   const t = {
@@ -115,17 +115,34 @@ const CheckoutFlow = ({ language, bookingData, onComplete }: CheckoutFlowProps) 
 
   // Step 1: Create booking
   const handleCreateBooking = async () => {
+    setBookingLoading(true);
     try {
-      const booking = await createBooking({
-        service_id: bookingData.service_id,
-        agenda: bookingData.agenda,
-        dados_formulario: bookingData.dados_formulario
+      const { data, error } = await supabase.functions.invoke('pedido', {
+        body: {
+          service_id: bookingData.service_id,
+          agenda: bookingData.agenda,
+          dados_formulario: bookingData.dados_formulario
+        }
       });
       
-      setBookingId(booking.booking_id);
+      if (error) throw error;
+      
+      setBookingId(data.booking_id);
       setCheckoutStep(2);
-    } catch (error) {
+      
+      toast({
+        title: 'Pedido criado com sucesso!',
+        description: `Serviço: ${data.service} | Valor: ${data.valor} AOA`
+      });
+    } catch (error: any) {
       console.error('Booking creation failed:', error);
+      toast({
+        title: 'Erro ao criar pedido',
+        description: error.message || 'Erro desconhecido',
+        variant: 'destructive'
+      });
+    } finally {
+      setBookingLoading(false);
     }
   };
 
@@ -140,17 +157,34 @@ const CheckoutFlow = ({ language, bookingData, onComplete }: CheckoutFlowProps) 
       return;
     }
 
+    setPaymentLoading(true);
     try {
-      const payment = await processPayment({
-        booking_id: bookingId,
-        payment_method: paymentMethod,
-        phone_number: phoneNumber
+      const { data, error } = await supabase.functions.invoke('checkout', {
+        body: {
+          booking_id: bookingId,
+          payment_method: paymentMethod,
+          phone_number: phoneNumber
+        }
       });
       
-      setPaymentReference(payment.payment_reference);
+      if (error) throw error;
+      
+      setPaymentReference(data.payment_reference);
       setCheckoutStep(3);
-    } catch (error) {
+      
+      toast({
+        title: 'Pagamento processado!',
+        description: `Referência: ${data.payment_reference}`
+      });
+    } catch (error: any) {
       console.error('Payment processing failed:', error);
+      toast({
+        title: 'Erro no pagamento',
+        description: error.message || 'Erro desconhecido',
+        variant: 'destructive'
+      });
+    } finally {
+      setPaymentLoading(false);
     }
   };
 
@@ -161,9 +195,38 @@ const CheckoutFlow = ({ language, bookingData, onComplete }: CheckoutFlowProps) 
     }
   }, [bookingData.service_id]);
 
-  const handleDownloadPDF = () => {
-    if (bookingId) {
-      generatePDF(bookingId);
+  const handleDownloadPDF = async () => {
+    if (!bookingId) return;
+    
+    setPdfLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(`pedido-pdf/${bookingId}`);
+      
+      if (error) throw error;
+      
+      // Create download link
+      const blob = new Blob([data], { type: 'text/html' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `pedido-${bookingId}.html`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'PDF gerado com sucesso!',
+        description: 'O arquivo foi baixado automaticamente.'
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao gerar PDF',
+        description: error.message || 'Erro desconhecido',
+        variant: 'destructive'
+      });
+    } finally {
+      setPdfLoading(false);
     }
   };
 
