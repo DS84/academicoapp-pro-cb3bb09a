@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SmartTriaging from '@/components/students/SmartTriaging';
+import ServicesCatalog from '@/components/students/ServicesCatalog';
+import StudentDashboard from '@/components/students/StudentDashboard';
+import ServiceFlows from '@/components/students/ServiceFlows';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,8 +12,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 const Students = () => {
   const [language, setLanguage] = useState('pt');
@@ -88,6 +90,8 @@ const Students = () => {
   const [session, setSession] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [selectedService, setSelectedService] = useState<string>('');
+  const [showServiceFlow, setShowServiceFlow] = useState(false);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, sess) => {
@@ -170,146 +174,49 @@ const Students = () => {
         <p className="text-lg text-muted-foreground max-w-3xl mb-10">{t.desc}</p>
 
         {!session?.user ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t.dashboard}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">{t.loginCta}</p>
-              <Button asChild>
-                <Link to="/login">{t.goLogin}</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="space-y-16">
+            {/* Triagem Inteligente */}
+            <SmartTriaging language={language} />
+            
+            {/* Catálogo de Serviços */}
+            <ServicesCatalog 
+              language={language} 
+              onServiceSelect={(serviceId) => {
+                setSelectedService(serviceId);
+                setShowServiceFlow(true);
+              }} 
+            />
+          </div>
         ) : (
-          <section aria-label={t.dashboard}>
-            <Tabs defaultValue="profile" className="w-full">
-              <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-6">
-                <TabsTrigger value="profile">{t.tabs.profile}</TabsTrigger>
-                <TabsTrigger value="schedule">{t.tabs.schedule}</TabsTrigger>
-                <TabsTrigger value="classes">{t.tabs.classes}</TabsTrigger>
-                <TabsTrigger value="payments">{t.tabs.payments}</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="profile">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{t.tabs.profile}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {loadingProfile ? (
-                      <p className="text-muted-foreground">Carregando…</p>
-                    ) : (
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">{t.profileLabels.name}</p>
-                          <p className="font-medium">{profile?.full_name ?? '-'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">{t.profileLabels.email}</p>
-                          <p className="font-medium">{profile?.email ?? session?.user?.email ?? '-'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">{t.profileLabels.phone}</p>
-                          <p className="font-medium">{profile?.phone ?? '-'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">{t.profileLabels.userType}</p>
-                          <p className="font-medium">{profile?.user_type ?? 'student'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">{t.profileLabels.plan}</p>
-                          <p className="font-medium">Gratuito</p>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="schedule">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{t.tabs.schedule}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <form onSubmit={handleSchedule} className="grid gap-4 max-w-xl">
-                      <div className="grid gap-2">
-                        <Label htmlFor="subject">{t.scheduleForm.subject}</Label>
-                        <Input id="subject" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Ex.: Matemática" />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="datetime">{t.scheduleForm.datetime}</Label>
-                        <Input id="datetime" type="datetime-local" value={dateTime} onChange={(e) => setDateTime(e.target.value)} />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="duration">{t.scheduleForm.duration}</Label>
-                        <Input id="duration" type="number" min={15} step={15} value={duration} onChange={(e) => setDuration(Number(e.target.value))} />
-                      </div>
-                      <p className="text-sm text-muted-foreground">{t.scheduleForm.note}</p>
-                      <div>
-                        <Button type="submit">{t.scheduleForm.submit}</Button>
-                      </div>
-                    </form>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="classes">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{t.tabs.classes}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {loadingSessions ? (
-                      <p className="text-muted-foreground">Carregando…</p>
-                    ) : sessionsList.length === 0 ? (
-                      <p className="text-muted-foreground">{t.classesEmpty}</p>
-                    ) : (
-                      <div className="grid gap-4">
-                        {sessionsList.map((s) => (
-                          <div key={s.id} className="border rounded-md p-4">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                              <div>
-                                <p className="font-medium">{new Date(s.session_date).toLocaleString()}</p>
-                                <p className="text-sm text-muted-foreground">Duração: {s.duration_minutes} min • Tipo: {s.session_type}</p>
-                              </div>
-                              <div>
-                                <span className="text-sm text-muted-foreground">Assunto ID: {s.subject_id ?? '—'}</span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="payments">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{t.tabs.payments}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <form onSubmit={handlePayment} className="grid gap-4 max-w-md">
-                      <div className="grid gap-2">
-                        <Label htmlFor="mm-phone">{t.profileLabels.phone}</Label>
-                        <Input id="mm-phone" inputMode="numeric" placeholder="Ex.: 923123456" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="mm-amount">Valor (AOA)</Label>
-                        <Input id="mm-amount" type="number" min={100} step={50} value={amount} onChange={(e) => setAmount(e.target.value)} />
-                      </div>
-                      <div>
-                        <Button type="submit">Pagar</Button>
-                      </div>
-                    </form>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </section>
+          <div className="space-y-8">
+            {showServiceFlow && selectedService ? (
+              <ServiceFlows
+                language={language}
+                selectedService={selectedService}
+                onComplete={() => {
+                  setShowServiceFlow(false);
+                  setSelectedService('');
+                }}
+              />
+            ) : (
+              <>
+                {/* Triagem Inteligente */}
+                <SmartTriaging language={language} />
+                
+                {/* Catálogo de Serviços */}
+                <ServicesCatalog 
+                  language={language} 
+                  onServiceSelect={(serviceId) => {
+                    setSelectedService(serviceId);
+                    setShowServiceFlow(true);
+                  }} 
+                />
+                
+                {/* Dashboard do Estudante */}
+                <StudentDashboard language={language} profile={profile} />
+              </>
+            )}
+          </div>
         )}
       </main>
       <Footer language={language} />
