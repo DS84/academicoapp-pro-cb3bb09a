@@ -202,6 +202,8 @@ const Teachers = () => {
         <h1 className="text-4xl md:text-5xl font-bold text-primary mb-6">{t.h1}</h1>
         <p className="text-lg text-muted-foreground max-w-3xl mb-10">{t.desc}</p>
 
+
+        {/* Triagem e Catálogo - sempre visíveis */}
         {showTriaging && (
           <div className="mb-10">
             <TeacherTriaging
@@ -235,6 +237,27 @@ const Teachers = () => {
           </div>
         )}
 
+        {/* Botões principais - sempre visíveis */}
+        {!showTriaging && !showCatalog && !showCheckout && (
+          <div className="text-center space-y-4 mb-10">
+            <Button
+              size="lg"
+              onClick={() => setShowTriaging(true)}
+              className="mr-4"
+            >
+              Começar Triagem (60s)
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setShowCatalog(true)}
+            >
+              Ver Catálogo de Serviços
+            </Button>
+          </div>
+        )}
+
+        {/* Seção de login/dashboard */}
         {!session?.user ? (
           <Card>
             <CardHeader>
@@ -251,25 +274,6 @@ const Teachers = () => {
           <p className="text-muted-foreground">Carregando…</p>
         ) : (
           <div className="space-y-8">
-            {!showTriaging && !showCatalog && !showCheckout && (
-              <div className="text-center space-y-4">
-                <Button
-                  size="lg"
-                  onClick={() => setShowTriaging(true)}
-                  className="mr-4"
-                >
-                  Começar Triagem (60s)
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setShowCatalog(true)}
-                >
-                  Ver Catálogo de Serviços
-                </Button>
-              </div>
-            )}
-
             {session?.user && profile && !showTriaging && !showCatalog && !showCheckout && (
               <TeacherDashboard
                 language={language}
