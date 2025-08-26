@@ -66,3 +66,15 @@ verify_jwt = true
 
 [functions.pedido-pdf]
 verify_jwt = true
+
+[functions.teacher-services]
+verify_jwt = false
+
+[functions.oer]
+verify_jwt = false
+
+[functions.trainings]
+verify_jwt = false
+
+[functions.teacher-pdf]
+verify_jwt = true

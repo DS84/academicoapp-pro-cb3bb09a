@@ -10,6 +10,14 @@ interface HeroSectionProps {
 const HeroSection = ({ language }: HeroSectionProps) => {
   const translations = {
     pt: {
+      // Teacher-focused content
+      teacherTitle: 'Ferramentas, formação e rede para elevar a sua prática docente.',
+      teacherSubtitle: 'Plataforma completa de desenvolvimento profissional para educadores angolanos. Recursos didáticos, formação CPD e comunidade colaborativa.',
+      teacherCta: 'Começar agora (60s)',
+      teacherSecondary: 'Ver Recursos',
+      teacherStats: '+600 professores formados • 4,8/5 de satisfação • Certificação CPD',
+      
+      // Student-focused content
       title: 'Suporte académico personalizado para transformar o teu estudo em resultados.',
       subtitle: 'Tutorias, materiais de estudo, orientação profissional e bolsas — tudo num só lugar.',
       description: 'Conectamos estudantes, professores e profissionais em Angola através de uma plataforma inovadora de apoio educacional e desenvolvimento profissional.',
@@ -18,6 +26,14 @@ const HeroSection = ({ language }: HeroSectionProps) => {
       stats: '+1.200 sessões concluídas • Satisfação 4,8/5'
     },
     en: {
+      // Teacher-focused content
+      teacherTitle: 'Tools, training and network to elevate your teaching practice.',
+      teacherSubtitle: 'Complete professional development platform for Angolan educators. Teaching resources, CPD training and collaborative community.',
+      teacherCta: 'Get started now (60s)',
+      teacherSecondary: 'View Resources',
+      teacherStats: '+600 teachers trained • 4.8/5 satisfaction • CPD Certification',
+      
+      // Student-focused content
       title: 'Personalized academic support to transform your studies into results.',
       subtitle: 'Tutoring, study materials, career guidance and scholarships — all in one place.',
       description: 'We connect students, teachers and professionals in Angola through an innovative platform for educational support and professional development.',

@@ -147,16 +147,16 @@ const TeacherCheckoutFlow = ({ language, service, onComplete, onBack }: TeacherC
             </div>
             
             <div className="border rounded-lg p-4">
-              <h3 className="font-semibold mb-2">{service.name}</h3>
-              <p className="text-sm text-muted-foreground mb-3">{service.description}</p>
+              <h3 className="font-semibold mb-2">{service.nome}</h3>
+              <p className="text-sm text-muted-foreground mb-3">{service.descricao}</p>
               <div className="flex gap-2 mb-2">
-                {service.formats.map((format: string) => (
+                {service.formatos?.map((format: string) => (
                   <Badge key={format} variant="secondary">{format}</Badge>
                 ))}
               </div>
               <div className="flex justify-between items-center">
-                <span>SLA: {service.sla}</span>
-                <span className="font-bold">{service.basePrice}</span>
+                <span>SLA: {service.sla_horas}h</span>
+                <span className="font-bold">{service.preco_base} AOA</span>
               </div>
             </div>
           </div>
@@ -241,12 +241,12 @@ const TeacherCheckoutFlow = ({ language, service, onComplete, onBack }: TeacherC
               <h3 className="font-semibold mb-3">{t.orderSummary}</h3>
               <div className="flex justify-between mb-2">
                 <span>{t.basePrice}:</span>
-                <span>{service.basePrice}</span>
+                <span>{service.preco_base} AOA</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between font-bold">
                 <span>{t.total}:</span>
-                <span>{service.basePrice}</span>
+                <span>{service.preco_base} AOA</span>
               </div>
             </div>
           </div>
@@ -264,7 +264,7 @@ const TeacherCheckoutFlow = ({ language, service, onComplete, onBack }: TeacherC
             
             <div className="border rounded-lg p-4 text-left">
               <h4 className="font-semibold mb-2">{t.serviceDetails}</h4>
-              <p className="text-sm text-muted-foreground mb-1">Serviço: {service.name}</p>
+              <p className="text-sm text-muted-foreground mb-1">Serviço: {service.nome}</p>
               <p className="text-sm text-muted-foreground mb-1">Data: {new Date(formData.agenda).toLocaleString()}</p>
               <p className="text-sm text-muted-foreground">Instituição: {formData.institution}</p>
             </div>
@@ -272,7 +272,7 @@ const TeacherCheckoutFlow = ({ language, service, onComplete, onBack }: TeacherC
             <div className="border rounded-lg p-4 text-left">
               <h4 className="font-semibold mb-2">{t.paymentDetails}</h4>
               <p className="text-sm text-muted-foreground mb-1">Método: {formData.paymentMethod === 'multicaixa' ? t.multicaixa : t.mobileMoney}</p>
-              <p className="text-sm text-muted-foreground">Total: {service.basePrice}</p>
+              <p className="text-sm text-muted-foreground">Total: {service.preco_base} AOA</p>
             </div>
 
             <Button

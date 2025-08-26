@@ -305,6 +305,45 @@ export type Database = {
           },
         ]
       }
+      communities: {
+        Row: {
+          canal: string | null
+          created_at: string
+          criador_id: string | null
+          descricao: string | null
+          id: string
+          membros_count: number | null
+          nome: string
+          tema: string
+          tipo: string | null
+          updated_at: string
+        }
+        Insert: {
+          canal?: string | null
+          created_at?: string
+          criador_id?: string | null
+          descricao?: string | null
+          id?: string
+          membros_count?: number | null
+          nome: string
+          tema: string
+          tipo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          canal?: string | null
+          created_at?: string
+          criador_id?: string | null
+          descricao?: string | null
+          id?: string
+          membros_count?: number | null
+          nome?: string
+          tema?: string
+          tipo?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       community_posts: {
         Row: {
           author_id: string
@@ -696,6 +735,96 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      oer_resources: {
+        Row: {
+          autor: string | null
+          created_at: string
+          disciplina: string
+          downloads: number | null
+          id: string
+          licenca: string | null
+          nivel: string
+          rating: number | null
+          tags: string[] | null
+          tipo: string
+          titulo: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          autor?: string | null
+          created_at?: string
+          disciplina: string
+          downloads?: number | null
+          id?: string
+          licenca?: string | null
+          nivel: string
+          rating?: number | null
+          tags?: string[] | null
+          tipo: string
+          titulo: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          autor?: string | null
+          created_at?: string
+          disciplina?: string
+          downloads?: number | null
+          id?: string
+          licenca?: string | null
+          nivel?: string
+          rating?: number | null
+          tags?: string[] | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
+      partnerships: {
+        Row: {
+          contato_destino: string | null
+          contato_origem: string | null
+          created_at: string
+          detalhes: Json | null
+          documento_mou_url: string | null
+          id: string
+          instituicao_destino: string
+          instituicao_origem: string
+          status: string | null
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          contato_destino?: string | null
+          contato_origem?: string | null
+          created_at?: string
+          detalhes?: Json | null
+          documento_mou_url?: string | null
+          id?: string
+          instituicao_destino: string
+          instituicao_origem: string
+          status?: string | null
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          contato_destino?: string | null
+          contato_origem?: string | null
+          created_at?: string
+          detalhes?: Json | null
+          documento_mou_url?: string | null
+          id?: string
+          instituicao_destino?: string
+          instituicao_origem?: string
+          status?: string | null
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       post_comments: {
         Row: {
@@ -1331,6 +1460,135 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          assunto: string
+          atribuido_a: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          plataforma: string | null
+          professor_id: string
+          resposta: string | null
+          severidade: string | null
+          sla: number | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          assunto: string
+          atribuido_a?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          plataforma?: string | null
+          professor_id: string
+          resposta?: string | null
+          severidade?: string | null
+          sla?: number | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assunto?: string
+          atribuido_a?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          plataforma?: string | null
+          professor_id?: string
+          resposta?: string | null
+          severidade?: string | null
+          sla?: number | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      teacher_services: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          formatos: string[] | null
+          id: string
+          nome: string
+          preco_base: number
+          sla_horas: number
+          slug: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          formatos?: string[] | null
+          id?: string
+          nome: string
+          preco_base: number
+          sla_horas: number
+          slug: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          formatos?: string[] | null
+          id?: string
+          nome?: string
+          preco_base?: number
+          sla_horas?: number
+          slug?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      trainings: {
+        Row: {
+          carga_horaria: number
+          certificacao_cpd: boolean | null
+          created_at: string
+          datas: string[] | null
+          descricao: string | null
+          id: string
+          instrutor_id: string | null
+          modalidade: string
+          preco: number | null
+          status: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          carga_horaria: number
+          certificacao_cpd?: boolean | null
+          created_at?: string
+          datas?: string[] | null
+          descricao?: string | null
+          id?: string
+          instrutor_id?: string | null
+          modalidade: string
+          preco?: number | null
+          status?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          carga_horaria?: number
+          certificacao_cpd?: boolean | null
+          created_at?: string
+          datas?: string[] | null
+          descricao?: string | null
+          id?: string
+          instrutor_id?: string | null
+          modalidade?: string
+          preco?: number | null
+          status?: string | null
+          titulo?: string
+          updated_at?: string
         }
         Relationships: []
       }
