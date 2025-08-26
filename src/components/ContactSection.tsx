@@ -3,12 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface ContactSectionProps {
   language: string;
 }
 
 const ContactSection = ({ language }: ContactSectionProps) => {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const translations = {
     pt: {
       title: 'Entre em Contacto',
@@ -58,6 +70,60 @@ const ContactSection = ({ language }: ContactSectionProps) => {
 
   const t = translations[language as keyof typeof translations];
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast({
+        title: language === 'pt' ? 'Erro' : 'Error',
+        description: language === 'pt' ? 'Por favor, preencha todos os campos.' : 'Please fill in all fields.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase.functions.invoke('send-contact-email', {
+        body: formData
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: language === 'pt' ? 'Sucesso' : 'Success',
+        description: language === 'pt' 
+          ? 'Mensagem enviada com sucesso! Entraremos em contacto brevemente.' 
+          : 'Message sent successfully! We will contact you shortly.',
+      });
+
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+    } catch (error) {
+      console.error('Error sending contact email:', error);
+      toast({
+        title: language === 'pt' ? 'Erro' : 'Error',
+        description: language === 'pt' 
+          ? 'Erro ao enviar mensagem. Tente novamente mais tarde.' 
+          : 'Error sending message. Please try again later.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section id="contact" className="py-20 bg-secondary/30">
       <div className="container mx-auto px-4">
@@ -74,38 +140,55 @@ const ContactSection = ({ language }: ContactSectionProps) => {
           {/* Contact Form */}
           <Card className="border-0 shadow-card">
             <CardContent className="p-8">
-              <form className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <Input 
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
                     placeholder={t.form.name}
                     className="h-12"
+                    required
                   />
                 </div>
                 <div>
                   <Input 
+                    name="email"
                     type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     placeholder={t.form.email}
                     className="h-12"
+                    required
                   />
                 </div>
                 <div>
                   <Input 
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleInputChange}
                     placeholder={t.form.subject}
                     className="h-12"
+                    required
                   />
                 </div>
                 <div>
                   <Textarea 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
                     placeholder={t.form.message}
                     className="min-h-32 resize-none"
+                    required
                   />
                 </div>
                 <Button 
                   type="submit" 
+                  disabled={isSubmitting}
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground h-12"
                 >
                   <Send className="mr-2 h-4 w-4" />
-                  {t.form.send}
+                  {isSubmitting ? (language === 'pt' ? 'Enviando...' : 'Sending...') : t.form.send}
                 </Button>
               </form>
             </CardContent>
