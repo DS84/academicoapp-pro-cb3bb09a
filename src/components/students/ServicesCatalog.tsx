@@ -35,9 +35,13 @@ const ServicesCatalog = ({ language, onServiceSelect }: ServicesCatalogProps) =>
 
   const fetchServices = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('services');
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .order('created_at', { ascending: true });
+      
       if (error) throw error;
-      setServices(data.services || []);
+      setServices(data || []);
     } catch (error) {
       console.error('Error fetching services:', error);
       toast({
