@@ -5,12 +5,13 @@ import SmartTriaging from '@/components/students/SmartTriaging';
 import ServicesCatalog from '@/components/students/ServicesCatalog';
 import StudentDashboard from '@/components/students/StudentDashboard';
 import ServiceFlows from '@/components/students/ServiceFlows';
+import CheckoutFlow from '@/components/students/CheckoutFlow';
+import RealtimePresence from '@/components/students/RealtimePresence';
+import RealtimeNotifications from '@/components/students/RealtimeNotifications';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 const Students = () => {
@@ -92,6 +93,8 @@ const Students = () => {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [selectedService, setSelectedService] = useState<string>('');
   const [showServiceFlow, setShowServiceFlow] = useState(false);
+  const [checkoutData, setCheckoutData] = useState<any>(null);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, sess) => {
@@ -168,10 +171,46 @@ const Students = () => {
         <meta name="description" content={t.desc} />
         <link rel="canonical" href="/students" />
       </Helmet>
-      <Header language={language} setLanguage={setLanguage} />
+      <Header 
+        language={language} 
+        setLanguage={setLanguage}
+        isAuthenticated={!!session?.user}
+        user={session?.user ? {
+          name: profile?.full_name || session.user.email?.split('@')[0],
+          email: session.user.email,
+          avatar: profile?.avatar_url
+        } : undefined}
+        onLogout={async () => {
+          await supabase.auth.signOut();
+          toast({ title: 'Logout realizado com sucesso!' });
+        }}
+      />
+      
+      {/* Real-time components for authenticated users */}
+      {session?.user && profile && (
+        <div className="fixed top-20 right-4 z-40 space-y-2">
+          <RealtimeNotifications language={language} userId={profile.id} />
+        </div>
+      )}
+      
       <main className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-6">{t.h1}</h1>
-        <p className="text-lg text-muted-foreground max-w-3xl mb-10">{t.desc}</p>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-primary">{t.h1}</h1>
+            <p className="text-lg text-muted-foreground max-w-3xl mt-4">{t.desc}</p>
+          </div>
+          
+          {/* Real-time presence for authenticated users */}
+          {session?.user && profile && (
+            <div className="hidden lg:block">
+              <RealtimePresence 
+                language={language} 
+                roomId="students_main" 
+                userProfile={profile} 
+              />
+            </div>
+          )}
+        </div>
 
         {!session?.user ? (
           <div className="space-y-16">
@@ -189,13 +228,37 @@ const Students = () => {
           </div>
         ) : (
           <div className="space-y-8">
-            {showServiceFlow && selectedService ? (
+            {showCheckout && checkoutData ? (
+              <CheckoutFlow
+                language={language}
+                bookingData={checkoutData}
+                onComplete={() => {
+                  setShowCheckout(false);
+                  setCheckoutData(null);
+                  toast({ 
+                    title: 'Pedido concluído!', 
+                    description: 'Obrigado pela tua confiança.' 
+                  });
+                }}
+              />
+            ) : showServiceFlow && selectedService ? (
               <ServiceFlows
                 language={language}
                 selectedService={selectedService}
                 onComplete={() => {
+                  // Mock checkout data - in real app, this would come from the service flow
+                  const mockCheckoutData = {
+                    service_id: selectedService,
+                    service_name: 'Serviço Selecionado',
+                    valor: 15000,
+                    agenda: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                    dados_formulario: { mock: true }
+                  };
+                  
+                  setCheckoutData(mockCheckoutData);
                   setShowServiceFlow(false);
                   setSelectedService('');
+                  setShowCheckout(true);
                 }}
               />
             ) : (
