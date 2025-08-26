@@ -508,6 +508,39 @@ export type Database = {
           },
         ]
       }
+      cv_reviews: {
+        Row: {
+          arquivo_url: string | null
+          created_at: string
+          id: string
+          score_ats: number | null
+          status: string
+          sugestoes: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          arquivo_url?: string | null
+          created_at?: string
+          id?: string
+          score_ats?: number | null
+          status?: string
+          sugestoes?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          arquivo_url?: string | null
+          created_at?: string
+          id?: string
+          score_ats?: number | null
+          status?: string
+          sugestoes?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       event_participants: {
         Row: {
           attendance_status: string | null
@@ -883,6 +916,322 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pro_assessments: {
+        Row: {
+          created_at: string
+          id: string
+          score: number
+          skill_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          score: number
+          skill_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          score?: number
+          skill_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_assessments_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "pro_skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pro_bookings: {
+        Row: {
+          agenda: string
+          created_at: string
+          dados_formulario: Json | null
+          id: string
+          service_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          valor: number
+        }
+        Insert: {
+          agenda: string
+          created_at?: string
+          dados_formulario?: Json | null
+          id?: string
+          service_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          valor: number
+        }
+        Update: {
+          agenda?: string
+          created_at?: string
+          dados_formulario?: Json | null
+          id?: string
+          service_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "pro_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pro_courses: {
+        Row: {
+          carga_horaria: number
+          certificado: boolean | null
+          created_at: string
+          datas: string[] | null
+          id: string
+          instrutor_id: string | null
+          modalidade: string
+          preco: number | null
+          titulo: string
+          trilha: string
+          updated_at: string
+        }
+        Insert: {
+          carga_horaria: number
+          certificado?: boolean | null
+          created_at?: string
+          datas?: string[] | null
+          id?: string
+          instrutor_id?: string | null
+          modalidade: string
+          preco?: number | null
+          titulo: string
+          trilha: string
+          updated_at?: string
+        }
+        Update: {
+          carga_horaria?: number
+          certificado?: boolean | null
+          created_at?: string
+          datas?: string[] | null
+          id?: string
+          instrutor_id?: string | null
+          modalidade?: string
+          preco?: number | null
+          titulo?: string
+          trilha?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pro_events: {
+        Row: {
+          created_at: string
+          data: string
+          descricao: string | null
+          id: string
+          local_plataforma: string | null
+          nome: string
+          preco: number | null
+          tipo: string
+          updated_at: string
+          vagas: number | null
+          vagas_ocupadas: number | null
+        }
+        Insert: {
+          created_at?: string
+          data: string
+          descricao?: string | null
+          id?: string
+          local_plataforma?: string | null
+          nome: string
+          preco?: number | null
+          tipo: string
+          updated_at?: string
+          vagas?: number | null
+          vagas_ocupadas?: number | null
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          descricao?: string | null
+          id?: string
+          local_plataforma?: string | null
+          nome?: string
+          preco?: number | null
+          tipo?: string
+          updated_at?: string
+          vagas?: number | null
+          vagas_ocupadas?: number | null
+        }
+        Relationships: []
+      }
+      pro_mentors: {
+        Row: {
+          areas: string[] | null
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          experiencia_anos: number
+          hourly_rate: number | null
+          id: string
+          nome: string
+          rating: number | null
+          slots: Json | null
+          updated_at: string
+        }
+        Insert: {
+          areas?: string[] | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          experiencia_anos?: number
+          hourly_rate?: number | null
+          id?: string
+          nome: string
+          rating?: number | null
+          slots?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          areas?: string[] | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          experiencia_anos?: number
+          hourly_rate?: number | null
+          id?: string
+          nome?: string
+          rating?: number | null
+          slots?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pro_opportunities: {
+        Row: {
+          created_at: string
+          empresa: string
+          id: string
+          is_active: boolean | null
+          link: string | null
+          local: string | null
+          requisitos: string[] | null
+          salario_max: number | null
+          salario_min: number | null
+          senioridade: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          empresa: string
+          id?: string
+          is_active?: boolean | null
+          link?: string | null
+          local?: string | null
+          requisitos?: string[] | null
+          salario_max?: number | null
+          salario_min?: number | null
+          senioridade: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          empresa?: string
+          id?: string
+          is_active?: boolean | null
+          link?: string | null
+          local?: string | null
+          requisitos?: string[] | null
+          salario_max?: number | null
+          salario_min?: number | null
+          senioridade?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pro_services: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          formatos: string[] | null
+          id: string
+          nome: string
+          preco_base: number
+          sla_horas: number
+          slug: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          formatos?: string[] | null
+          id?: string
+          nome: string
+          preco_base: number
+          sla_horas: number
+          slug: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          formatos?: string[] | null
+          id?: string
+          nome?: string
+          preco_base?: number
+          sla_horas?: number
+          slug?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pro_skills: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          nivel_recomendado: string
+          nome: string
+          trilha: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nivel_recomendado: string
+          nome: string
+          trilha: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nivel_recomendado?: string
+          nome?: string
+          trilha?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {

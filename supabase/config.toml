@@ -78,3 +78,9 @@ verify_jwt = false
 
 [functions.teacher-pdf]
 verify_jwt = true
+
+[functions.pro-services]
+verify_jwt = false
+
+[functions.pro-pdf]
+verify_jwt = true
