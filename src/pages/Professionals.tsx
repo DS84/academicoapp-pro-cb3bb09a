@@ -176,7 +176,12 @@ const Professionals = () => {
         <link rel="canonical" href="/professionals" />
       </Helmet>
       
-      <Header language={language} setLanguage={setLanguage} />
+      <Header 
+        language={language} 
+        setLanguage={setLanguage}
+        isAuthenticated={false}
+        onLogout={() => {}}
+      />
       
       <main className="container mx-auto px-4 py-16">
         {currentStep !== 'landing' && currentStep !== 'dashboard' && (

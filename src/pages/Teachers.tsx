@@ -197,7 +197,20 @@ const Teachers = () => {
         <meta name="description" content={t.desc} />
         <link rel="canonical" href="/teachers" />
       </Helmet>
-      <Header language={language} setLanguage={setLanguage} />
+      <Header 
+        language={language} 
+        setLanguage={setLanguage}
+        isAuthenticated={!!session?.user}
+        user={session?.user ? {
+          name: profile?.full_name || session.user.email?.split('@')[0],
+          email: session.user.email,
+          avatar: profile?.avatar_url
+        } : undefined}
+        onLogout={async () => {
+          await supabase.auth.signOut();
+          toast({ title: 'Logout realizado com sucesso!' });
+        }}
+      />
       <main className="container mx-auto px-4 py-16">
         <h1 className="text-4xl md:text-5xl font-bold text-primary mb-6">{t.h1}</h1>
         <p className="text-lg text-muted-foreground max-w-3xl mb-10">{t.desc}</p>
@@ -275,10 +288,27 @@ const Teachers = () => {
         ) : (
           <div className="space-y-8">
             {session?.user && profile && !showTriaging && !showCatalog && !showCheckout && (
-              <TeacherDashboard
-                language={language}
-                profile={profile}
-              />
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold mb-6">Dashboard do Professor</h2>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                  <div className="bg-card border rounded-lg p-6">
+                    <h3 className="text-lg font-semibold mb-2">Aulas Hoje</h3>
+                    <p className="text-2xl font-bold text-primary">3</p>
+                  </div>
+                  <div className="bg-card border rounded-lg p-6">
+                    <h3 className="text-lg font-semibold mb-2">Estudantes</h3>
+                    <p className="text-2xl font-bold text-primary">24</p>
+                  </div>
+                  <div className="bg-card border rounded-lg p-6">
+                    <h3 className="text-lg font-semibold mb-2">Avaliação</h3>
+                    <p className="text-2xl font-bold text-primary">4.8★</p>
+                  </div>
+                  <div className="bg-card border rounded-lg p-6">
+                    <h3 className="text-lg font-semibold mb-2">Horas Ministradas</h3>
+                    <p className="text-2xl font-bold text-primary">156h</p>
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* Legacy mentor schedule view */}

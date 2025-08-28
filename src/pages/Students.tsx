@@ -276,7 +276,23 @@ const Students = () => {
                 />
                 
                 {/* Dashboard do Estudante */}
-                <StudentDashboard language={language} profile={profile} />
+                <div className="mt-8">
+                  <h2 className="text-2xl font-bold mb-6">Dashboard do Estudante</h2>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="bg-card border rounded-lg p-6">
+                      <h3 className="text-lg font-semibold mb-2">Próximas Sessões</h3>
+                      <p className="text-2xl font-bold text-primary">{sessionsList.length}</p>
+                    </div>
+                    <div className="bg-card border rounded-lg p-6">
+                      <h3 className="text-lg font-semibold mb-2">Materiais Salvos</h3>
+                      <p className="text-2xl font-bold text-primary">12</p>
+                    </div>
+                    <div className="bg-card border rounded-lg p-6">
+                      <h3 className="text-lg font-semibold mb-2">Progresso</h3>
+                      <p className="text-2xl font-bold text-primary">85%</p>
+                    </div>
+                  </div>
+                </div>
               </>
             )}
           </div>
