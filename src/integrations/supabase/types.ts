@@ -769,6 +769,48 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          metadata: Json | null
+          title: string
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          metadata?: Json | null
+          title: string
+          type?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          metadata?: Json | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       oer_resources: {
         Row: {
           autor: string | null
@@ -1941,6 +1983,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_dashboard_stats: {
+        Row: {
+          average_rating: number | null
+          completed_bookings: number | null
+          courses_completed: number | null
+          courses_enrolled: number | null
+          id: string
+          last_activity: string | null
+          pending_bookings: number | null
+          reviews_received: number | null
+          total_bookings: number | null
+          total_earned: number | null
+          total_spent: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          average_rating?: number | null
+          completed_bookings?: number | null
+          courses_completed?: number | null
+          courses_enrolled?: number | null
+          id?: string
+          last_activity?: string | null
+          pending_bookings?: number | null
+          reviews_received?: number | null
+          total_bookings?: number | null
+          total_earned?: number | null
+          total_spent?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          average_rating?: number | null
+          completed_bookings?: number | null
+          courses_completed?: number | null
+          courses_enrolled?: number | null
+          id?: string
+          last_activity?: string | null
+          pending_bookings?: number | null
+          reviews_received?: number | null
+          total_bookings?: number | null
+          total_earned?: number | null
+          total_spent?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           assigned_at: string | null
@@ -2007,9 +2097,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_unread_notification_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       get_user_role: {
         Args: { user_uuid: string }
         Returns: string
+      }
+      mark_notification_read: {
+        Args: { notification_id: string }
+        Returns: undefined
       }
     }
     Enums: {

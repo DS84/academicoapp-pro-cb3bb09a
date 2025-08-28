@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import UserDropdown from './UserDropdown';
 import SearchBar from './SearchBar';
+import NotificationCenter from './notifications/NotificationCenter';
 
 interface HeaderProps {
   language: string;
@@ -92,12 +93,15 @@ const Header = ({ language, setLanguage, isAuthenticated = false, user, onLogout
             </Select>
             
             {isAuthenticated ? (
-              <UserDropdown 
-                language={language}
-                isAuthenticated={isAuthenticated}
-                user={user}
-                onLogout={onLogout || (() => {})}
-              />
+              <div className="flex items-center gap-4">
+                <NotificationCenter language={language as 'pt' | 'en'} />
+                <UserDropdown 
+                  language={language}
+                  isAuthenticated={isAuthenticated}
+                  user={user}
+                  onLogout={onLogout || (() => {})}
+                />
+              </div>
             ) : (
               <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Link to="/login">{t.getStarted}</Link>
