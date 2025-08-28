@@ -65,12 +65,12 @@ const Header = ({ language, setLanguage, isAuthenticated = false, user, onLogout
             <Link to="/professionals" className="text-foreground hover:text-accent transition-colors">
               {t.professionals}
             </Link>
-            <Link to="/#about" className="text-foreground hover:text-accent transition-colors">
+            <a href="#about" className="text-foreground hover:text-accent transition-colors">
               {t.about}
-            </Link>
-            <Link to="/#contact" className="text-foreground hover:text-accent transition-colors">
+            </a>
+            <a href="#contact" className="text-foreground hover:text-accent transition-colors">
               {t.contact}
-            </Link>
+            </a>
           </nav>
 
           {/* Search Bar (when authenticated) */}
@@ -133,12 +133,12 @@ const Header = ({ language, setLanguage, isAuthenticated = false, user, onLogout
               <Link to="/professionals" className="text-foreground hover:text-accent transition-colors">
                 {t.professionals}
               </Link>
-              <Link to="/#about" className="text-foreground hover:text-accent transition-colors">
+              <a href="#about" className="text-foreground hover:text-accent transition-colors">
                 {t.about}
-              </Link>
-              <Link to="/#contact" className="text-foreground hover:text-accent transition-colors">
+              </a>
+              <a href="#contact" className="text-foreground hover:text-accent transition-colors">
                 {t.contact}
-              </Link>
+              </a>
               
               {/* Mobile Search Bar (when authenticated) */}
               {isAuthenticated && (

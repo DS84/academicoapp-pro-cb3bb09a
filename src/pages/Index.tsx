@@ -44,8 +44,12 @@ const Index = () => {
       />
       <HeroSection language={language} />
       <ServicesSection language={language} />
-      <AboutSection language={language} />
-      <ContactSection language={language} />
+      <div id="about">
+        <AboutSection language={language} />
+      </div>
+      <div id="contact">
+        <ContactSection language={language} />
+      </div>
       <Footer language={language} />
     </div>
   );
