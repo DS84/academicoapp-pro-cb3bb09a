@@ -22,7 +22,7 @@ export const useProfile = (userId?: string) => {
         .from('profiles')
         .select('*')
         .eq('user_id', id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         throw error;
@@ -49,7 +49,7 @@ export const useProfile = (userId?: string) => {
         .update(updates)
         .eq('user_id', userId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         throw error;
@@ -69,23 +69,29 @@ export const useProfile = (userId?: string) => {
     if (!id) return null;
 
     try {
-      const { data, error } = await supabase
+      // First try to get from user_roles table if it exists
+      const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', id)
         .order('assigned_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching user role:', error);
-        return null;
+      if (roleData?.role) {
+        return roleData.role;
       }
 
-      return data?.role || null;
+      // Fallback to profile user_type if user_roles doesn't exist or is empty
+      if (profile?.user_type) {
+        return profile.user_type;
+      }
+
+      return 'student'; // Default fallback
     } catch (err) {
       console.error('Error fetching user role:', err);
-      return null;
+      // Return profile user_type as fallback
+      return profile?.user_type || 'student';
     }
   };
 

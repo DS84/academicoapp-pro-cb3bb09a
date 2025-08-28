@@ -12,6 +12,8 @@ import Teachers from "./pages/Teachers";
 import Professionals from "./pages/Professionals";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import SecuritySettings from "./pages/SecuritySettings";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
@@ -33,6 +35,8 @@ const App = () => (
           <Route path="/professionals" element={<Professionals />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/security-settings" element={<SecuritySettings />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
