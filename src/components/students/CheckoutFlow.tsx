@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { CheckCircle, Clock, CreditCard, Smartphone, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface CheckoutFlowProps {
   language: string;
@@ -32,7 +33,7 @@ const CheckoutFlow = ({ language, bookingData, onComplete }: CheckoutFlowProps) 
   const [bookingLoading, setBookingLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
-  const { toast } = useToast();
+  const { user, session } = useAuth();
 
   const t = {
     pt: {
@@ -121,7 +122,7 @@ const CheckoutFlow = ({ language, bookingData, onComplete }: CheckoutFlowProps) 
       const { data: userProfile, error: profileError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('user_id', user?.id)
+        .eq('user_id', session?.user?.id)
         .maybeSingle();
 
       if (profileError) {
@@ -131,19 +132,26 @@ const CheckoutFlow = ({ language, bookingData, onComplete }: CheckoutFlowProps) 
       if (!userProfile) {
         throw new Error('Perfil não encontrado. Complete o seu perfil primeiro.');
       }
+
+      // Create booking using edge function
+      const { data, error } = await supabase.functions.invoke('pedido', {
+        body: {
+          service_id: bookingData.service_id,
+          estudante_id: userProfile.id,
+          agenda: bookingData.agenda,
+          dados_formulario: bookingData.dados_formulario
+        }
+      });
+      
+      if (error) throw error;
+      
+      setBookingId(data.booking_id);
       setCheckoutStep(2);
       
-      toast({
-        title: 'Pedido criado com sucesso!',
-        description: `Serviço: ${data.service} | Valor: ${data.valor} AOA`
-      });
+      toast.success(`Pedido criado! Serviço: ${data.service} | Valor: ${data.valor} AOA`);
     } catch (error: any) {
       console.error('Booking creation failed:', error);
-      toast({
-        title: 'Erro ao criar pedido',
-        description: error.message || 'Erro desconhecido',
-        variant: 'destructive'
-      });
+      toast.error(error.message || 'Erro ao criar pedido');
     } finally {
       setBookingLoading(false);
     }
@@ -152,11 +160,7 @@ const CheckoutFlow = ({ language, bookingData, onComplete }: CheckoutFlowProps) 
   // Step 2: Process payment
   const handlePayment = async () => {
     if (!paymentMethod || !phoneNumber) {
-      toast({
-        title: 'Campos obrigatórios',
-        description: 'Por favor, preenche todos os campos de pagamento.',
-        variant: 'destructive'
-      });
+      toast.error('Por favor, preenche todos os campos de pagamento.');
       return;
     }
 
@@ -175,17 +179,10 @@ const CheckoutFlow = ({ language, bookingData, onComplete }: CheckoutFlowProps) 
       setPaymentReference(data.payment_reference);
       setCheckoutStep(3);
       
-      toast({
-        title: 'Pagamento processado!',
-        description: `Referência: ${data.payment_reference}`
-      });
+      toast.success(`Pagamento processado! Referência: ${data.payment_reference}`);
     } catch (error: any) {
       console.error('Payment processing failed:', error);
-      toast({
-        title: 'Erro no pagamento',
-        description: error.message || 'Erro desconhecido',
-        variant: 'destructive'
-      });
+      toast.error(error.message || 'Erro no pagamento');
     } finally {
       setPaymentLoading(false);
     }
@@ -218,16 +215,9 @@ const CheckoutFlow = ({ language, bookingData, onComplete }: CheckoutFlowProps) 
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
       
-      toast({
-        title: 'PDF gerado com sucesso!',
-        description: 'O arquivo foi baixado automaticamente.'
-      });
+      toast.success('PDF gerado com sucesso! O arquivo foi baixado automaticamente.');
     } catch (error: any) {
-      toast({
-        title: 'Erro ao gerar PDF',
-        description: error.message || 'Erro desconhecido',
-        variant: 'destructive'
-      });
+      toast.error(error.message || 'Erro ao gerar PDF');
     } finally {
       setPdfLoading(false);
     }
