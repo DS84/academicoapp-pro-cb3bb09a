@@ -101,15 +101,19 @@ const ProfessionalCheckoutFlow = ({ service, onSuccess, onBack, language }: Prof
     setLoading(true);
     
     try {
-      // Get user profile
-      const { data: profile } = await supabase
+      // Get user profile with error handling
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (profileError) {
+        throw new Error('Erro ao obter perfil: ' + profileError.message);
+      }
 
       if (!profile) {
-        throw new Error('Profile not found');
+        throw new Error('Perfil não encontrado. Complete o seu perfil primeiro.');
       }
 
       // Create booking

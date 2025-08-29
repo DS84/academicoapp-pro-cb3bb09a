@@ -105,7 +105,8 @@ export default function SecuritySettings() {
       
       setRecentActivity((data || []) as SecurityActivity[]);
     } catch (error) {
-      console.error('Error fetching activity:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao carregar atividade';
+      console.error('Error fetching activity:', errorMessage);
     }
   };
 

@@ -111,14 +111,21 @@ const ProfessionalDashboard = ({ language }: ProfessionalDashboardProps) => {
       if (!user) return;
 
       try {
-        // Get user profile
-        const { data: profile } = await supabase
+        // Get user profile with proper error handling
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('id')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
-        if (!profile) return;
+        if (profileError) {
+          throw new Error('Erro ao obter perfil: ' + profileError.message);
+        }
+
+        if (!profile) {
+          console.warn('Profile not found for user:', user.id);
+          return;
+        }
 
         // Fetch all data in parallel
         const [
