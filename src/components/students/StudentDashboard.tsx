@@ -156,13 +156,13 @@ const StudentDashboard = ({ language, profile }: StudentDashboardProps) => {
     
     setLoading(true);
     try {
-      // Carregar sessões de mentoria próximas
+      // Load upcoming sessions using existing tables
       const { data: sessions } = await supabase
-        .from('career_sessions')
-        .select('*')
-        .eq('client_id', profile.id)
-        .gte('session_date', new Date().toISOString())
-        .order('session_date', { ascending: true })
+        .from('bookings')
+        .select('*, services(nome)')
+        .eq('estudante_id', profile.id)
+        .gte('agenda', new Date().toISOString())
+        .order('agenda', { ascending: true })
         .limit(5);
 
       // Carregar materiais (demo data)

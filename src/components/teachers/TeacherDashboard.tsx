@@ -114,23 +114,16 @@ const TeacherDashboard = ({ language, profile }: TeacherDashboardProps) => {
 
       // Fetch communities
       const { data: communitiesData } = await supabase
-        .from('study_group_members')
-        .select(`
-          *,
-          study_groups (
-            id,
-            name,
-            description,
-            current_members
-          )
-        `)
-        .eq('member_id', profile.id);
+        .from('communities')
+        .select('*')
+        .eq('tipo', 'publico')
+        .limit(10);
 
       // Fetch support tickets
       const { data: ticketsData } = await supabase
-        .from('assistance_requests')
+        .from('support_tickets')
         .select('*')
-        .eq('requester_id', profile.id)
+        .eq('professor_id', profile.id)
         .order('created_at', { ascending: false });
 
       // Mock data for exchanges and certificates
