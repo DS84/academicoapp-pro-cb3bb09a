@@ -8,7 +8,7 @@ import { Calendar, FileText, Target, TrendingUp, Clock, BookOpen, Award, Downloa
 import { supabase } from '@/integrations/supabase/client';
 
 interface StudentDashboardProps {
-  language: string;
+  language: 'pt' | 'en';
   profile: any;
 }
 

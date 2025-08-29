@@ -99,7 +99,7 @@ const Profile = () => {
             </Card>
           </div>
         </main>
-        <Footer language={language} />
+        <Footer language={language as 'pt' | 'en'} />
       </div>
     );
   }
@@ -111,7 +111,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header 
-        language={language} 
+                  language={language as 'pt' | 'en'}
         setLanguage={setLanguage}
         isAuthenticated={!!user}
         user={getUserData()}
@@ -183,7 +183,7 @@ const Profile = () => {
           </Card>
         </div>
       </main>
-      <Footer language={language} />
+      <Footer language={language as 'pt' | 'en'} />
     </div>
   );
 };

@@ -99,7 +99,7 @@ const Dashboard = () => {
       <main>
         {renderDashboard()}
       </main>
-      <Footer language={language} />
+      <Footer language={language as 'pt' | 'en'} />
     </div>
   );
 };

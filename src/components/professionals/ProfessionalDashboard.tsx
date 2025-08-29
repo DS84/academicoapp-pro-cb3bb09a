@@ -24,7 +24,7 @@ interface DashboardData {
 }
 
 interface ProfessionalDashboardProps {
-  language: string;
+  language: 'pt' | 'en';
 }
 
 const ProfessionalDashboard = ({ language }: ProfessionalDashboardProps) => {

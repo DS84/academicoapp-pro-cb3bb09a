@@ -298,7 +298,7 @@ const Students = () => {
           </div>
         )}
       </main>
-      <Footer language={language} />
+      <Footer language={language as 'pt' | 'en'} />
     </div>
   );
 };

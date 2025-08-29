@@ -50,7 +50,7 @@ const Index = () => {
       <div id="contact">
         <ContactSection language={language} />
       </div>
-      <Footer language={language} />
+      <Footer language={language as 'pt' | 'en'} />
     </div>
   );
 };

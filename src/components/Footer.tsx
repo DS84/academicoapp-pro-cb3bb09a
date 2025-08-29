@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import TermsModal from './TermsModal';
 
 interface FooterProps {
-  language: string;
+  language: 'pt' | 'en';
 }
 
 const Footer = ({ language }: FooterProps) => {

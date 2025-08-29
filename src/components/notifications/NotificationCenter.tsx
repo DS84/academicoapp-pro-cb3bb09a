@@ -107,8 +107,9 @@ const NotificationCenter = ({ language = 'pt' }: NotificationCenterProps) => {
       setUnreadCount(prev => Math.max(0, prev - 1));
 
     } catch (error) {
-      console.error('Error marking notification as read:', error);
-      toast.error('Erro ao marcar notificação como lida');
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao marcar notificação como lida';
+      console.error('Error marking notification as read:', errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -124,7 +125,8 @@ const NotificationCenter = ({ language = 'pt' }: NotificationCenterProps) => {
 
       toast.success('Todas as notificações foram marcadas como lidas');
     } catch (error) {
-      console.error('Error marking all as read:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao marcar todas como lidas';
+      console.error('Error marking all as read:', errorMessage);
     }
   };
 

@@ -97,7 +97,7 @@ const Header = ({ language, setLanguage, isAuthenticated = false, user, onLogout
               <div className="flex items-center gap-4">
                 <NotificationCenter language={language as 'pt' | 'en'} />
                 <UserDropdown 
-                  language={language}
+                  language={language as 'pt' | 'en'}
                   isAuthenticated={isAuthenticated}
                   user={user}
                   onLogout={onLogout || (() => {})}
@@ -161,7 +161,7 @@ const Header = ({ language, setLanguage, isAuthenticated = false, user, onLogout
                 
                 {isAuthenticated ? (
                   <UserDropdown 
-                    language={language}
+                    language={language as 'pt' | 'en'}
                     isAuthenticated={isAuthenticated}
                     user={user}
                     onLogout={onLogout || (() => {})}

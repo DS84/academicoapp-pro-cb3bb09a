@@ -265,7 +265,7 @@ export default function SecuritySettings() {
         </div>
       </main>
       
-      <Footer language={language} />
+      <Footer language={language as 'pt' | 'en'} />
     </div>
   );
 }

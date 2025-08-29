@@ -18,7 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface TeacherDashboardProps {
-  language: string;
+  language: 'pt' | 'en';
   profile: any;
 }
 

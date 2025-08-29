@@ -12,7 +12,7 @@ import { User, Settings, LayoutDashboard, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface UserDropdownProps {
-  language: string;
+  language: 'pt' | 'en';
   isAuthenticated: boolean;
   user?: {
     name?: string;

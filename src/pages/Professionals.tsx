@@ -120,7 +120,7 @@ const Professionals = () => {
         );
       
       case 'dashboard':
-        return <ProfessionalDashboard language={language} />;
+        return <ProfessionalDashboard language={language as 'pt' | 'en'} />;
       
       default:
         return (
@@ -204,7 +204,7 @@ const Professionals = () => {
         {renderContent()}
       </main>
       
-      <Footer language={language} />
+      <Footer language={language as 'pt' | 'en'} />
     </div>
   );
 };
