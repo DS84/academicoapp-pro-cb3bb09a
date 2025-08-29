@@ -125,25 +125,23 @@ const ProfessionalDashboard = ({ language }: ProfessionalDashboardProps) => {
           coursesRes,
           mentorsRes,
           eventsRes,
-          opportunitiesRes,
           cvReviewsRes,
           bookingsRes,
           assessmentsRes
         ] = await Promise.all([
           supabase.from('pro_courses').select('*').order('created_at', { ascending: false }),
-          supabase.from('pro_mentors').select('*').order('rating', { ascending: false }),
+          supabase.from('service_mentors').select('*, profiles(full_name, avatar_url)').eq('is_active', true).order('rating', { ascending: false }),
           supabase.from('pro_events').select('*').gte('data', new Date().toISOString()).order('data'),
-          supabase.from('pro_opportunities').select('*').eq('is_active', true).order('created_at', { ascending: false }),
           supabase.from('cv_reviews').select('*').eq('user_id', profile.id).order('created_at', { ascending: false }),
           supabase.from('pro_bookings').select('*, pro_services(nome)').eq('user_id', profile.id).order('created_at', { ascending: false }),
-          supabase.from('pro_assessments').select('*, pro_skills(nome, trilha)').eq('user_id', profile.id).order('created_at', { ascending: false })
+          supabase.from('pro_assessments').select('*, skills(name, difficulty_level)').eq('user_id', profile.id).order('created_at', { ascending: false })
         ]);
 
         setData({
           courses: coursesRes.data || [],
           mentors: mentorsRes.data || [],
           events: eventsRes.data || [],
-          opportunities: opportunitiesRes.data || [],
+          opportunities: [],
           cvReviews: cvReviewsRes.data || [],
           bookings: bookingsRes.data || [],
           assessments: assessmentsRes.data || []
@@ -261,12 +259,12 @@ const ProfessionalDashboard = ({ language }: ProfessionalDashboardProps) => {
                 <Card key={mentor.id}>
                   <CardHeader>
                     <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={mentor.avatar_url} />
-                        <AvatarFallback>{mentor.nome.charAt(0)}</AvatarFallback>
-                      </Avatar>
+                       <Avatar>
+                         <AvatarImage src={mentor.profiles?.avatar_url} />
+                         <AvatarFallback>{(mentor.nome || mentor.profiles?.full_name || 'M').charAt(0)}</AvatarFallback>
+                       </Avatar>
                       <div>
-                        <CardTitle className="text-lg">{mentor.nome}</CardTitle>
+                        <CardTitle className="text-lg">{mentor.nome || mentor.profiles?.full_name}</CardTitle>
                         <div className="flex items-center gap-1">
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                           <span className="text-sm">{mentor.rating}/5</span>
@@ -284,16 +282,11 @@ const ProfessionalDashboard = ({ language }: ProfessionalDashboardProps) => {
                         ))}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {mentor.experiencia_anos} {t.experience}
+                        Mentor especializado
                       </div>
-                      {mentor.hourly_rate && (
-                        <div className="text-sm font-medium">
-                          {new Intl.NumberFormat('pt-AO', {
-                            style: 'currency',
-                            currency: 'AOA'
-                          }).format(Number(mentor.hourly_rate))}/hora
-                        </div>
-                      )}
+                      <div className="text-sm font-medium">
+                        Disponível para mentoria
+                      </div>
                       <Button className="w-full" size="sm">
                         <Users className="mr-2 h-4 w-4" />
                         {t.contact}
