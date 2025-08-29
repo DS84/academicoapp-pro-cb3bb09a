@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Users, 
-  HelpCircle, 
-  BookOpen, 
-  DollarSign, 
+  MessageSquare, 
   TrendingUp, 
   Clock,
   CheckCircle,
@@ -27,54 +25,58 @@ const TeacherDashboard = ({ language = 'pt' }: TeacherDashboardProps) => {
 
   const translations = {
     pt: {
-      welcome: 'Bem-vindo, Professor',
-      overview: 'Resumo de Atividade',
+      welcome: 'Bem-vindo de volta',
+      dashboardTitle: 'Dashboard do Professor',
+      overview: 'Visão Geral da Atividade',
       totalTickets: 'Total de Tickets',
       openTickets: 'Tickets Abertos',
       resolvedTickets: 'Tickets Resolvidos',
-      totalEarned: 'Total Ganho',
-      studentsHelped: 'Estudantes Ajudados',
-      averageRating: 'Avaliação Média',
-      recentTickets: 'Tickets Recentes',
-      noTickets: 'Sem tickets recentes',
-      viewAll: 'Ver Todos',
+      pendingTickets: 'Tickets Pendentes',
+      quickActions: 'Ações Rápidas',
       createTicket: 'Criar Ticket',
       manageCourses: 'Gerir Cursos',
-      quickActions: 'Ações Rápidas',
-      status: 'Estado',
-      open: 'Aberto',
-      closed: 'Fechado',
-      inProgress: 'Em Progresso',
-      severity: 'Severidade',
-      low: 'Baixa',
-      medium: 'Média',
-      high: 'Alta',
-      critical: 'Crítica',
+      recentTickets: 'Tickets Recentes',
+      noTickets: 'Nenhum ticket encontrado.',
+      viewDetails: 'Ver Detalhes',
+      severity: {
+        baixa: 'Baixa',
+        media: 'Média',
+        alta: 'Alta',
+        critica: 'Crítica'
+      },
+      status: {
+        aberto: 'Aberto',
+        em_progresso: 'Em Progresso',
+        resolvido: 'Resolvido',
+        fechado: 'Fechado'
+      }
     },
     en: {
-      welcome: 'Welcome, Teacher',
+      welcome: 'Welcome back',
+      dashboardTitle: 'Teacher Dashboard',
       overview: 'Activity Overview',
       totalTickets: 'Total Tickets',
       openTickets: 'Open Tickets',
       resolvedTickets: 'Resolved Tickets',
-      totalEarned: 'Total Earned',
-      studentsHelped: 'Students Helped',
-      averageRating: 'Average Rating',
-      recentTickets: 'Recent Tickets',
-      noTickets: 'No recent tickets',
-      viewAll: 'View All',
+      pendingTickets: 'Pending Tickets',
+      quickActions: 'Quick Actions',
       createTicket: 'Create Ticket',
       manageCourses: 'Manage Courses',
-      quickActions: 'Quick Actions',
-      status: 'Status',
-      open: 'Open',
-      closed: 'Closed',
-      inProgress: 'In Progress',
-      severity: 'Severity',
-      low: 'Low',
-      medium: 'Medium',
-      high: 'High',
-      critical: 'Critical',
+      recentTickets: 'Recent Tickets',
+      noTickets: 'No tickets found.',
+      viewDetails: 'View Details',
+      severity: {
+        baixa: 'Low',
+        media: 'Medium',
+        alta: 'High',
+        critica: 'Critical'
+      },
+      status: {
+        aberto: 'Open',
+        em_progresso: 'In Progress',
+        resolvido: 'Resolved',
+        fechado: 'Closed'
+      }
     }
   };
 
@@ -84,30 +86,24 @@ const TeacherDashboard = ({ language = 'pt' }: TeacherDashboardProps) => {
     if (!user || !profile) return;
 
     try {
+      setLoading(true);
+
       // Fetch support tickets
-      const { data: tickets, error: ticketsError } = await supabase
+      const { data: tickets } = await supabase
         .from('support_tickets')
         .select('*')
         .eq('professor_id', profile.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
+        .order('created_at', { ascending: false });
 
-      if (ticketsError) throw ticketsError;
-      setRecentTickets(tickets || []);
+      const ticketStats = {
+        total: tickets?.length || 0,
+        open: tickets?.filter(t => t.status === 'aberto').length || 0,
+        resolved: tickets?.filter(t => t.status === 'resolvido').length || 0,
+        pending: tickets?.filter(t => t.status === 'em_progresso').length || 0,
+      };
 
-      // Calculate stats
-      const totalTickets = tickets?.length || 0;
-      const openTickets = tickets?.filter(t => t.status === 'aberto').length || 0;
-      const resolvedTickets = tickets?.filter(t => t.status === 'fechado').length || 0;
-
-      setStats({
-        totalTickets,
-        openTickets,
-        resolvedTickets,
-        totalEarned: 0, // Will be calculated from actual earnings
-        studentsHelped: 0, // Will be calculated from unique students
-        averageRating: 4.5, // Placeholder
-      });
+      setStats(ticketStats);
+      setRecentTickets(tickets?.slice(0, 5) || []);
 
     } catch (error) {
       console.error('Error fetching teacher dashboard data:', error);
@@ -121,215 +117,155 @@ const TeacherDashboard = ({ language = 'pt' }: TeacherDashboardProps) => {
   }, [user, profile]);
 
   const getStatusBadge = (status: string) => {
-    const variants: { [key: string]: 'default' | 'secondary' | 'destructive' | 'outline' } = {
-      aberto: 'destructive',
-      'em progresso': 'default',
-      fechado: 'secondary',
+    const statusMap = {
+      aberto: { variant: 'destructive' as const, text: t.status.aberto },
+      em_progresso: { variant: 'secondary' as const, text: t.status.em_progresso },
+      resolvido: { variant: 'default' as const, text: t.status.resolvido },
+      fechado: { variant: 'outline' as const, text: t.status.fechado }
     };
-
-    return (
-      <Badge variant={variants[status] || 'outline'}>
-        {status === 'aberto' ? t.open : status === 'fechado' ? t.closed : status}
-      </Badge>
-    );
+    
+    const statusInfo = statusMap[status as keyof typeof statusMap] || statusMap.aberto;
+    return <Badge variant={statusInfo.variant}>{statusInfo.text}</Badge>;
   };
 
   const getSeverityBadge = (severity: string) => {
-    const colors: { [key: string]: string } = {
-      baixa: 'bg-green-500',
-      media: 'bg-yellow-500',
-      alta: 'bg-orange-500',
-      critica: 'bg-red-500',
+    const severityMap = {
+      baixa: { variant: 'outline' as const, text: t.severity.baixa },
+      media: { variant: 'secondary' as const, text: t.severity.media },
+      alta: { variant: 'destructive' as const, text: t.severity.alta },
+      critica: { variant: 'destructive' as const, text: t.severity.critica }
     };
-
-    return (
-      <span className={`w-2 h-2 rounded-full ${colors[severity] || 'bg-gray-500'}`} />
-    );
+    
+    const severityInfo = severityMap[severity as keyof typeof severityMap] || severityMap.media;
+    return <Badge variant={severityInfo.variant}>{severityInfo.text}</Badge>;
   };
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-muted rounded w-1/3 mb-4"></div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, i) => (
-              <Card key={i}>
-                <CardContent className="p-6">
-                  <div className="h-4 bg-muted rounded mb-2"></div>
-                  <div className="h-8 bg-muted rounded"></div>
-                </CardContent>
-              </Card>
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto space-y-6">
+          <div className="h-12 bg-muted rounded animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-32 bg-muted rounded animate-pulse" />
             ))}
           </div>
+          <div className="h-64 bg-muted rounded animate-pulse" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="flex items-center justify-between">
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Welcome Header */}
         <div>
           <h1 className="text-3xl font-bold text-primary">
-            {t.welcome}, {profile?.full_name?.split(' ')[0] || 'Professor'}!
+            {t.welcome}, {profile?.full_name || user?.email}!
           </h1>
-          <p className="text-muted-foreground">
-            Aqui está o resumo da sua atividade de ensino
-          </p>
+          <p className="text-muted-foreground mt-2">{t.dashboardTitle}</p>
         </div>
-      </div>
 
-      {/* Stats Overview */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">{t.overview}</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <HelpCircle className="h-4 w-4 text-muted-foreground" />
-                <div className="ml-2">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {t.totalTickets}
-                  </p>
-                  <p className="text-2xl font-bold">{stats?.totalTickets || 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Stats Overview */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">{t.overview}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{t.totalTickets}</CardTitle>
+                <MessageSquare className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats?.total || 0}</div>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <AlertCircle className="h-4 w-4 text-orange-500" />
-                <div className="ml-2">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {t.openTickets}
-                  </p>
-                  <p className="text-2xl font-bold text-orange-600">
-                    {stats?.openTickets || 0}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{t.openTickets}</CardTitle>
+                <AlertCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats?.open || 0}</div>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <div className="ml-2">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {t.resolvedTickets}
-                  </p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {stats?.resolvedTickets || 0}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{t.resolvedTickets}</CardTitle>
+                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats?.resolved || 0}</div>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <div className="ml-2">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {t.studentsHelped}
-                  </p>
-                  <p className="text-2xl font-bold">{stats?.studentsHelped || 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                <div className="ml-2">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {t.averageRating}
-                  </p>
-                  <p className="text-2xl font-bold">{stats?.averageRating || 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <div className="ml-2">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {t.totalEarned}
-                  </p>
-                  <p className="text-2xl font-bold">
-                    {new Intl.NumberFormat('pt-AO', {
-                      style: 'currency',
-                      currency: 'AOA',
-                      minimumFractionDigits: 0,
-                    }).format(stats?.totalEarned || 0)}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{t.pendingTickets}</CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats?.pending || 0}</div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
 
-      {/* Quick Actions */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">{t.quickActions}</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <Button size="lg" className="justify-start">
-            <HelpCircle className="mr-2 h-4 w-4" />
-            {t.createTicket}
-          </Button>
-          <Button variant="outline" size="lg" className="justify-start">
-            <BookOpen className="mr-2 h-4 w-4" />
-            {t.manageCourses}
-          </Button>
-        </div>
-      </div>
-
-      {/* Recent Tickets */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">{t.recentTickets}</h2>
-          <Button variant="outline" size="sm">
-            {t.viewAll}
-          </Button>
-        </div>
-        
+        {/* Quick Actions */}
         <Card>
-          <CardContent className="p-6">
-            {recentTickets.length === 0 ? (
-              <p className="text-muted-foreground text-center py-4">
-                {t.noTickets}
-              </p>
-            ) : (
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              {t.quickActions}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-4">
+              <Button>
+                <MessageSquare className="mr-2 h-4 w-4" />
+                {t.createTicket}
+              </Button>
+              <Button variant="outline">
+                <Users className="mr-2 h-4 w-4" />
+                {t.manageCourses}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Tickets */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              {t.recentTickets}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentTickets.length > 0 ? (
               <div className="space-y-4">
                 {recentTickets.map((ticket) => (
-                  <div key={ticket.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      {getSeverityBadge(ticket.severidade)}
-                      <div className="flex-1">
-                        <p className="font-medium">{ticket.assunto}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {ticket.plataforma} • {new Date(ticket.created_at).toLocaleDateString('pt-PT')}
-                        </p>
-                      </div>
+                  <div key={ticket.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <p className="font-medium">{ticket.assunto}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(ticket.created_at).toLocaleDateString()}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2">
+                      {getSeverityBadge(ticket.severidade)}
                       {getStatusBadge(ticket.status)}
+                      <Button variant="outline" size="sm">
+                        {t.viewDetails}
+                      </Button>
                     </div>
                   </div>
                 ))}
               </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">{t.noTickets}</p>
             )}
           </CardContent>
         </Card>
