@@ -38,26 +38,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { profile, loading: profileLoading, refreshProfile: refetchProfile } = useProfile(user?.id);
 
   useEffect(() => {
-    // Get initial session
+    let mounted = true;
+
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
+      }
+    );
+
+    // THEN check for existing session
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    };
-
-    getSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      if (mounted) {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
       }
-    );
+    };
 
-    return () => subscription.unsubscribe();
+    getSession();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Update user role when profile changes
@@ -71,35 +80,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = async (email: string, password: string, userData: Partial<UserProfile>) => {
     try {
+      const redirectUrl = `${window.location.origin}/dashboard`;
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          emailRedirectTo: redirectUrl,
           data: userData
         }
       });
 
       if (error) throw error;
-
-      // Create profile
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            user_id: data.user.id,
-            email: email,
-            full_name: userData.full_name || '',
-            user_type: userData.user_type || 'student',
-            phone: userData.phone,
-            institution: userData.institution,
-            field_of_study: userData.field_of_study,
-            year_of_study: userData.year_of_study
-          });
-
-        if (profileError) {
-          console.error('Profile creation error:', profileError);
-        }
-      }
 
       return { error: null };
     } catch (error) {

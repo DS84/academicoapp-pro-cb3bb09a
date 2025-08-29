@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Menu, X } from 'lucide-react';
@@ -65,10 +66,10 @@ const Header = ({ language, setLanguage, isAuthenticated = false, user, onLogout
             <Link to="/professionals" className="text-foreground hover:text-accent transition-colors">
               {t.professionals}
             </Link>
-            <a href="#about" className="text-foreground hover:text-accent transition-colors">
+            <a href="/#about" className="text-foreground hover:text-accent transition-colors">
               {t.about}
             </a>
-            <a href="#contact" className="text-foreground hover:text-accent transition-colors">
+            <a href="/#contact" className="text-foreground hover:text-accent transition-colors">
               {t.contact}
             </a>
           </nav>
@@ -133,10 +134,10 @@ const Header = ({ language, setLanguage, isAuthenticated = false, user, onLogout
               <Link to="/professionals" className="text-foreground hover:text-accent transition-colors">
                 {t.professionals}
               </Link>
-              <a href="#about" className="text-foreground hover:text-accent transition-colors">
+              <a href="/#about" className="text-foreground hover:text-accent transition-colors">
                 {t.about}
               </a>
-              <a href="#contact" className="text-foreground hover:text-accent transition-colors">
+              <a href="/#contact" className="text-foreground hover:text-accent transition-colors">
                 {t.contact}
               </a>
               

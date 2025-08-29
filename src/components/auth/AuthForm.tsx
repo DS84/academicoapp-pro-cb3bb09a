@@ -129,7 +129,10 @@ const AuthForm = ({ mode, language }: AuthFormProps) => {
     try {
       if (mode === 'login') {
         const { error } = await signIn(formData.email, formData.password);
-        if (!error) {
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success(language === 'pt' ? 'Login realizado com sucesso!' : 'Login successful!');
           navigate('/dashboard');
         }
       } else {
@@ -142,12 +145,16 @@ const AuthForm = ({ mode, language }: AuthFormProps) => {
           year_of_study: formData.year_of_study,
         });
         
-        if (!error) {
-          // User will be redirected after email confirmation
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success(language === 'pt' ? 'Conta criada! Verifique seu email.' : 'Account created! Check your email.');
+          navigate('/login');
         }
       }
     } catch (error) {
       console.error('Auth error:', error);
+      toast.error(language === 'pt' ? 'Erro inesperado' : 'Unexpected error');
     } finally {
       setIsSubmitting(false);
     }
