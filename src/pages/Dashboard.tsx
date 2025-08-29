@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import StudentDashboard from '@/components/dashboards/StudentDashboard';
-import TeacherDashboard from '@/components/dashboards/TeacherDashboard';
-import ProfessionalDashboard from '@/components/dashboards/ProfessionalDashboard';
+import StudentDashboard from '@/components/students/StudentDashboard';
+import TeacherDashboard from '@/components/teachers/TeacherDashboard';
+import ProfessionalDashboard from '@/components/professionals/ProfessionalDashboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -73,13 +73,13 @@ const Dashboard = () => {
 
     switch (profile.user_type) {
       case 'student':
-        return <StudentDashboard language={language as 'pt' | 'en'} />;
+        return <StudentDashboard language={language as 'pt' | 'en'} profile={profile} />;
       case 'teacher':
-        return <TeacherDashboard language={language as 'pt' | 'en'} />;
+        return <TeacherDashboard language={language as 'pt' | 'en'} profile={profile} />;
       case 'professional':
         return <ProfessionalDashboard language={language as 'pt' | 'en'} />;
       default:
-        return <StudentDashboard language={language as 'pt' | 'en'} />;
+        return <StudentDashboard language={language as 'pt' | 'en'} profile={profile} />;
     }
   };
 

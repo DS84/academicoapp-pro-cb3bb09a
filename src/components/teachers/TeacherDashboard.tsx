@@ -101,18 +101,9 @@ const TeacherDashboard = ({ language, profile }: TeacherDashboardProps) => {
     try {
       // Fetch courses (CPD)
       const { data: coursesData } = await supabase
-        .from('course_enrollments')
-        .select(`
-          *,
-          courses (
-            id,
-            title,
-            description,
-            instructor_id,
-            duration_hours
-          )
-        `)
-        .eq('student_id', profile.id);
+        .from('courses')
+        .select('*')
+        .eq('instructor_id', profile.id);
 
       // Fetch library materials
       const { data: libraryData } = await supabase

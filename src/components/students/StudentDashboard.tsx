@@ -158,9 +158,9 @@ const StudentDashboard = ({ language, profile }: StudentDashboardProps) => {
     try {
       // Carregar sessões de mentoria próximas
       const { data: sessions } = await supabase
-        .from('mentorship_sessions')
+        .from('career_sessions')
         .select('*')
-        .eq('student_id', profile.id)
+        .eq('client_id', profile.id)
         .gte('session_date', new Date().toISOString())
         .order('session_date', { ascending: true })
         .limit(5);
