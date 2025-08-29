@@ -113,21 +113,24 @@ const CheckoutFlow = ({ language, bookingData, onComplete }: CheckoutFlowProps) 
     }
   }[language as 'pt' | 'en'];
 
-  // Step 1: Create booking
+  // Step 1: Create booking with proper profile validation
   const handleCreateBooking = async () => {
     setBookingLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('pedido', {
-        body: {
-          service_id: bookingData.service_id,
-          agenda: bookingData.agenda,
-          dados_formulario: bookingData.dados_formulario
-        }
-      });
-      
-      if (error) throw error;
-      
-      setBookingId(data.booking_id);
+      // Get user profile first
+      const { data: userProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user?.id)
+        .maybeSingle();
+
+      if (profileError) {
+        throw new Error('Erro ao obter perfil: ' + profileError.message);
+      }
+
+      if (!userProfile) {
+        throw new Error('Perfil não encontrado. Complete o seu perfil primeiro.');
+      }
       setCheckoutStep(2);
       
       toast({

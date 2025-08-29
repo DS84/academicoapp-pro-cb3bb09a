@@ -101,7 +101,7 @@ const ProfessionalCheckoutFlow = ({ service, onSuccess, onBack, language }: Prof
     setLoading(true);
     
     try {
-      // Get user profile with error handling
+      // Get user profile with proper error handling
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id')
@@ -116,10 +116,10 @@ const ProfessionalCheckoutFlow = ({ service, onSuccess, onBack, language }: Prof
         throw new Error('Perfil não encontrado. Complete o seu perfil primeiro.');
       }
 
-      // Create booking
+      // Create booking with validated profile ID
       const bookingData = {
         service_id: service.id,
-        user_id: profile.id,
+        user_id: profile.id, // Using profile.id instead of user.id
         agenda: formData.data_preferida ? new Date(formData.data_preferida).toISOString() : new Date().toISOString(),
         valor: service.preco_base,
         dados_formulario: {

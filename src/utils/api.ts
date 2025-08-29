@@ -1,16 +1,40 @@
+import { useState } from 'react';
 import { toast } from 'sonner';
+import { handleApiError } from '@/utils/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
+import { ApiResponse } from '@/types/common';
 
 // Enhanced API utility functions with proper error handling
 
-export const handleApiError = (error: unknown, context?: string): string => {
-  const errorMessage = error instanceof Error ? error.message : 'Erro inesperado';
-  
-  if (context) {
-    console.error(`Error in ${context}:`, errorMessage);
-  }
-  
-  return errorMessage;
+export const useApi = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const executeQuery = async <T>(
+    operation: () => Promise<any>,
+    context: string
+  ): Promise<ApiResponse<T>> => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { data, error: queryError } = await operation();
+      
+      if (queryError) {
+        throw queryError;
+      }
+      
+      return { data, error: null, loading: false };
+    } catch (err) {
+      const errorMessage = handleApiError(err, context);
+      setError(errorMessage);
+      return { data: null, error: new Error(errorMessage), loading: false };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { executeQuery, loading, error };
 };
 
 // Services API functions
@@ -47,10 +71,21 @@ export const proServicesApi = {
     
     if (error) throw error;
     return data;
+  },
+
+  getById: async (id: string) => {
+    const { data, error } = await supabase
+      .from('pro_services')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
   }
 };
 
-// Teacher services API functions  
+// Teacher services API functions
 export const teacherServicesApi = {
   getAll: async () => {
     const { data, error } = await supabase
@@ -76,7 +111,7 @@ export const bookingsApi = {
     return data;
   },
 
-  getByProfileId: async (profileId: string) => {
+  getByUserId: async (profileId: string) => {
     const { data, error } = await supabase
       .from('bookings')
       .select('*, services(nome)')
@@ -99,6 +134,17 @@ export const proBookingsApi = {
     
     if (error) throw error;
     return data;
+  },
+
+  getByUserId: async (profileId: string) => {
+    const { data, error } = await supabase
+      .from('pro_bookings')
+      .select('*, pro_services(nome)')
+      .eq('user_id', profileId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
   }
 };
 
@@ -110,6 +156,33 @@ export const profilesApi = {
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  update: async (userId: string, updates: any) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('user_id', userId)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  }
+};
+
+// Mentorship sessions API functions
+export const mentorshipSessionsApi = {
+  getByStudentId: async (studentId: string) => {
+    const { data, error } = await supabase
+      .from('mentorship_sessions')
+      .select('*')
+      .eq('student_id', studentId)
+      .gte('session_date', new Date().toISOString())
+      .order('session_date', { ascending: true });
     
     if (error) throw error;
     return data;
