@@ -212,19 +212,62 @@ const Students = () => {
           )}
         </div>
 
+        {/* Section Navigation Buttons */}
+        <div className="flex flex-wrap gap-4 mb-8">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => {
+              const triagingSection = document.getElementById('triaging-section');
+              triagingSection?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="flex items-center gap-2"
+          >
+            🧠 {language === 'pt' ? 'Triagem Inteligente' : 'Smart Triaging'}
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => {
+              const catalogSection = document.getElementById('catalog-section');
+              catalogSection?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="flex items-center gap-2"
+          >
+            📚 {language === 'pt' ? 'Catálogo de Serviços' : 'Services Catalog'}
+          </Button>
+          {session?.user && (
+            <Button
+              variant="default"
+              size="lg"
+              onClick={() => {
+                const dashboardSection = document.getElementById('dashboard-section');
+                dashboardSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex items-center gap-2"
+            >
+              🎯 {language === 'pt' ? 'Meu Dashboard' : 'My Dashboard'}
+            </Button>
+          )}
+        </div>
+
         {!session?.user ? (
           <div className="space-y-16">
             {/* Triagem Inteligente */}
-            <SmartTriaging language={language} />
+            <section id="triaging-section">
+              <SmartTriaging language={language} />
+            </section>
             
             {/* Catálogo de Serviços */}
-            <ServicesCatalog 
-              language={language} 
-              onServiceSelect={(serviceId) => {
-                setSelectedService(serviceId);
-                setShowServiceFlow(true);
-              }} 
-            />
+            <section id="catalog-section">
+              <ServicesCatalog 
+                language={language} 
+                onServiceSelect={(serviceId) => {
+                  setSelectedService(serviceId);
+                  setShowServiceFlow(true);
+                }} 
+              />
+            </section>
           </div>
         ) : (
           <div className="space-y-8">
@@ -264,19 +307,23 @@ const Students = () => {
             ) : (
               <>
                 {/* Triagem Inteligente */}
-                <SmartTriaging language={language} />
+                <section id="triaging-section">
+                  <SmartTriaging language={language} />
+                </section>
                 
                 {/* Catálogo de Serviços */}
-                <ServicesCatalog 
-                  language={language} 
-                  onServiceSelect={(serviceId) => {
-                    setSelectedService(serviceId);
-                    setShowServiceFlow(true);
-                  }} 
-                />
+                <section id="catalog-section">
+                  <ServicesCatalog 
+                    language={language} 
+                    onServiceSelect={(serviceId) => {
+                      setSelectedService(serviceId);
+                      setShowServiceFlow(true);
+                    }} 
+                  />
+                </section>
                 
                 {/* Dashboard do Estudante */}
-                <div className="mt-8">
+                <section id="dashboard-section" className="mt-8">
                   <h2 className="text-2xl font-bold mb-6">Dashboard do Estudante</h2>
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     <div className="bg-card border rounded-lg p-6">
@@ -292,7 +339,7 @@ const Students = () => {
                       <p className="text-2xl font-bold text-primary">85%</p>
                     </div>
                   </div>
-                </div>
+                </section>
               </>
             )}
           </div>
