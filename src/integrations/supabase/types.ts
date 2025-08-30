@@ -2097,6 +2097,15 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_safe_profile_data: {
+        Args: { profile_id: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+          id: string
+          user_type: string
+        }[]
+      }
       get_unread_notification_count: {
         Args: Record<PropertyKey, never>
         Returns: number
