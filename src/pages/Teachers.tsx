@@ -250,25 +250,24 @@ const Teachers = () => {
           </div>
         )}
 
-        {/* Botões principais - sempre visíveis */}
-        {!showTriaging && !showCatalog && !showCheckout && (
-          <div className="text-center space-y-4 mb-10">
-            <Button
-              size="lg"
-              onClick={() => setShowTriaging(true)}
-              className="mr-4"
-            >
-              Começar Triagem (60s)
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => setShowCatalog(true)}
-            >
-              Ver Catálogo de Serviços
-            </Button>
-          </div>
-        )}
+        {/* Section Navigation Buttons */}
+        <div className="flex flex-wrap gap-4 mb-8 justify-center">
+          <Button
+            size="lg"
+            onClick={() => setShowTriaging(true)}
+            className="px-8 py-3"
+          >
+            Começar Triagem (60s)
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => setShowCatalog(true)}
+            className="px-8 py-3"
+          >
+            Ver Catálogo de Serviços
+          </Button>
+        </div>
 
         {/* Seção de login/dashboard */}
         {!session?.user ? (
